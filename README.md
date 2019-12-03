@@ -1,1 +1,1 @@
-# arcanumbot
+# ArcanumBot
