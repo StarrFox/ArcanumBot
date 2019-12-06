@@ -122,7 +122,7 @@ class aacoins(commands.Cog):
         """
         self.coins[member.id] = 0
         self.save_coins()
-        message = f"Cleared {member}'s {aacoins}"
+        message = f"Cleared {member}'s aacoin(s)"
         await ctx.send(message)
         logger.info(message)
 
