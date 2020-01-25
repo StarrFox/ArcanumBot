@@ -1,6 +1,7 @@
 from discord.ext import commands
 
-SCHOLAR_ID = 385972092010496000
+# Todo: fix role name
+SCHOLAR_ID = 561659914267656202
 
 def is_scholar_or_above():
     def pred(ctx: commands.Context):
