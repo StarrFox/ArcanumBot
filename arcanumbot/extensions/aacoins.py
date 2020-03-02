@@ -38,7 +38,7 @@ class aacoins(commands.Cog):
         """
         member = member or ctx.author
         amount = await self.bot.get_aacoin_amount(member.id)
-        plural = len(amount) != 1
+        plural = amount != 1
         await ctx.send(f"{member} has {amount} {ctx.bot.aacoin}{'s' if plural else ''}.")
 
     @view_aacoins.command(name='all')
@@ -70,7 +70,7 @@ class aacoins(commands.Cog):
         message = f"Added {amount} to {member}'s {ctx.bot.aacoin} balance."
         await ctx.send(message)
 
-    @commands.command(name='remove')
+    @commands.command(name='remove', aliases=['rem'])
     @checks.is_coin_mod_or_above()
     async def remove_aacoins(self, ctx: commands.Context, member: discord.Member, amount: int):
         """
