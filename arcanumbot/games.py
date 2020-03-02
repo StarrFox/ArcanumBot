@@ -37,6 +37,8 @@ class EmojiGameMenu(menus.Menu):
         super().__init__(**kwargs)
         self.value = None
         self.map = self.get_map()
+        for button in [menus.Button(e, self.do_emoji_react) for e in self.map]:
+            self.add_button(button)
 
     async def send_initial_message(self, ctx, channel):
         return await ctx.send(

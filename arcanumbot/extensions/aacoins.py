@@ -62,7 +62,7 @@ class aacoins(commands.Cog):
         """
         Add aacoins to a member
         """
-        current = await self.bot.get_aacoin_amount(member.id)
+        current = await self.bot.get_aacoin_amount(member.id) or 0
         await self.bot.set_aacoins(member.id, current + amount)
         message = f"Added {amount} to {member}'s aacoin(s)."
         await ctx.send(message)
@@ -73,7 +73,7 @@ class aacoins(commands.Cog):
         """
         Remove aacoins from a member
         """
-        current = await self.bot.get_aacoin_amount(member.id)
+        current = await self.bot.get_aacoin_amount(member.id) or 0
         await self.bot.set_aacoins(member.id, current - amount)
         message = f"Removed {amount} from {member}'s aacoin(s)."
         await ctx.send(message)
