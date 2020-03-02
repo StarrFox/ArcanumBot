@@ -31,6 +31,17 @@ class aacoins(commands.Cog):
     def __init__(self, bot: ArcanumBot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        if member.guild != self.bot.guild:
+            return
+
+        logger.info(f'{member} left guild.')
+        coins = await self.bot.get_aacoin_amount(member.id)
+
+        if coins:
+            await self.bot.prompt_delete(member.id)
+
     @commands.group(name='coins', invoke_without_command=True)
     async def view_aacoins(self, ctx: commands.Context, member: discord.Member = None):
         """

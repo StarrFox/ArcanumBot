@@ -48,16 +48,6 @@ class ArcanumBot(DiscordChan):
     #     while not self.is_closed():
     #         await asyncio.sleep(100)
 
-    async def on_member_remove(self, member):
-        if member.guild != self.guild:
-            return
-
-        logger.info(f'{member} left guild.')
-        coins = await self.get_aacoin_amount(member.id)
-
-        if coins:
-            await self.prompt_delete(member.id)
-
     async def on_ready(self):
         if self.ready_once:
             return
