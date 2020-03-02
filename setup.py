@@ -11,5 +11,5 @@ setup(
     author='StarrFox',
     author_email='',
     description='A discord bot for the arcanum\'s archives discord',
-    install_requires=['discord_chan', 'aiosqlite']
+    install_requires=['discord_chan', 'aiosqlite', 'jishaku', 'humanize']
 )

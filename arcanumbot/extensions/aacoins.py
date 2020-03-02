@@ -16,7 +16,9 @@
 
 import discord
 import logging
+from datetime import timedelta
 
+import humanize
 from discord.ext import commands
 from discord_chan import NormalPageSource, DCMenuPages
 
@@ -32,16 +34,17 @@ class aacoins(commands.Cog):
     @commands.group(name='coins', invoke_without_command=True)
     async def view_aacoins(self, ctx: commands.Context, member: discord.Member = None):
         """
-        View another member or your aacoin amount
+        View another member or your aacoin amount.
         """
         member = member or ctx.author
         amount = await self.bot.get_aacoin_amount(member.id)
-        await ctx.send(f"{member} has {amount} aacoin(s).")
+        plural = len(amount) != 1
+        await ctx.send(f"{member} has {amount} {ctx.bot.aacoin}{'s' if plural else ''}.")
 
     @view_aacoins.command(name='all')
     async def view_all_aacoins(self, ctx: commands.Context):
         """
-        View all aacoins sorted by amount
+        View all aacoins sorted by amount.
         """
         lb = await self.bot.get_aacoin_lb()
 
@@ -60,38 +63,39 @@ class aacoins(commands.Cog):
     @checks.is_coin_mod_or_above()
     async def add_aacoins(self, ctx: commands.Context, member: discord.Member, amount: int):
         """
-        Add aacoins to a member
+        Add aacoins to a member.
         """
         current = await self.bot.get_aacoin_amount(member.id)
         await self.bot.set_aacoins(member.id, current + amount)
-        message = f"Added {amount} to {member}'s aacoin(s)."
+        message = f"Added {amount} to {member}'s {ctx.bot.aacoin} balance."
         await ctx.send(message)
 
     @commands.command(name='remove')
     @checks.is_coin_mod_or_above()
     async def remove_aacoins(self, ctx: commands.Context, member: discord.Member, amount: int):
         """
-        Remove aacoins from a member
+        Remove aacoins from a member.
         """
         current = await self.bot.get_aacoin_amount(member.id)
         await self.bot.set_aacoins(member.id, current - amount)
-        message = f"Removed {amount} from {member}'s aacoin(s)."
+        message = f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance."
         await ctx.send(message)
 
     @commands.command(name='clear')
     @checks.is_coin_mod_or_above()
     async def clear_aacoins(self, ctx: commands.Context, member: discord.Member):
         """
-        Clear a member's aacoin(s)
+        Clear a member's aacoin(s).
         """
         await self.bot.delete_user_aacoins(member.id)
-        message = f"Cleared {member}'s aacoin(s)."
+        message = f"Cleared {member}'s {ctx.bot.aacoin} balance"
         await ctx.send(message)
 
     @commands.command(name='react')
+    @commands.cooldown(1, 86400, commands.BucketType.user)
     async def aacoins_react_game(self, ctx: commands.Context):
         """
-        Play a game of Emoji react
+        Play a game of Emoji react; can only be played once a day.
         """
         game = EmojiGameMenu()
         value = await game.run(ctx)
@@ -105,6 +109,19 @@ class aacoins(commands.Cog):
 
         else:
             await ctx.send(f'React timed out.')
+            raise Exception()
+
+    @aacoins_react_game.error
+    async def on_aacoins_react_game_error(self, ctx, error):
+        error = getattr(error, 'original', error)
+
+        if isinstance(error, commands.CommandOnCooldown):
+            delta = timedelta(seconds=error.retry_after)
+            natural = humanize.naturaldelta(delta)
+
+            return await ctx.send(f'You can play react again in {natural}.')
+
+        ctx.command.reset_cooldown(ctx)
 
 def setup(bot: ArcanumBot):
     bot.add_cog(aacoins(bot))

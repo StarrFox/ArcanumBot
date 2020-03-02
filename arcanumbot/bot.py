@@ -119,7 +119,7 @@ class ArcanumBot(DiscordChan):
     @staticmethod
     async def get_aacoin_lb():
         async with db.get_database() as connection:
-            cursor = await connection.execute('SELECT user_id, coins FROM coins ORDER BY coins;')
+            cursor = await connection.execute('SELECT user_id, coins FROM coins ORDER BY coins DESC;')
 
             return await cursor.fetchall()
 
