@@ -38,15 +38,15 @@ class ArcanumBot(DiscordChan):
         self.prompt_tasks = []
         self.logging_channel = None
 
-    # # Todo: remove before going into prod
-    # async def start(self, *args, **kwargs):
-    #     # Todo: uncomment to run
-    #     # await super().start(*args, **kwargs)
-    #
-    #     # Temp replacement for self.connect
-    #     import asyncio
-    #     while not self.is_closed():
-    #         await asyncio.sleep(100)
+    # Todo: remove before going into prod
+    async def start(self, *args, **kwargs):
+        # Todo: uncomment to run
+        # await super().start(*args, **kwargs)
+
+        # Temp replacement for self.connect
+        import asyncio
+        while not self.is_closed():
+            await asyncio.sleep(100)
 
     async def on_ready(self):
         if self.ready_once:
@@ -107,7 +107,7 @@ class ArcanumBot(DiscordChan):
     @staticmethod
     async def get_aacoin_amount(user_id):
         async with db.get_database() as connection:
-            cursor = await connection.execute('SELECT FROM coins WHERE user_id = (?);', (user_id,))
+            cursor = await connection.execute('SELECT coins FROM coins WHERE user_id = (?);', (user_id,))
 
             return await cursor.fetchone()
 
