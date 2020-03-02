@@ -73,6 +73,8 @@ def main():
                      loop=loop
                      )
 
+    bot.load_extension('jishaku')
+
     # Todo: make sure to comment
     # bot.dispatch('ready')
 

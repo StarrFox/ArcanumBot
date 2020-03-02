@@ -62,7 +62,7 @@ class aacoins(commands.Cog):
         """
         Add aacoins to a member
         """
-        current = await self.bot.get_aacoin_amount(member.id) or 0
+        current = await self.bot.get_aacoin_amount(member.id)
         await self.bot.set_aacoins(member.id, current + amount)
         message = f"Added {amount} to {member}'s aacoin(s)."
         await ctx.send(message)
@@ -73,7 +73,7 @@ class aacoins(commands.Cog):
         """
         Remove aacoins from a member
         """
-        current = await self.bot.get_aacoin_amount(member.id) or 0
+        current = await self.bot.get_aacoin_amount(member.id)
         await self.bot.set_aacoins(member.id, current - amount)
         message = f"Removed {amount} from {member}'s aacoin(s)."
         await ctx.send(message)
@@ -97,8 +97,14 @@ class aacoins(commands.Cog):
         value = await game.run(ctx)
 
         if value:
+            current = await self.bot.get_aacoin_amount(ctx.author.id)
+            await self.bot.set_aacoins(ctx.author.id, current + value)
+
             await ctx.send(f'\N{PARTY POPPER} you won {value} {ctx.bot.aacoin}s\n'
-                           f'you now have a total of {1}')
+                           f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
+
+        else:
+            await ctx.send(f'React timed out.')
 
 def setup(bot: ArcanumBot):
     bot.add_cog(aacoins(bot))
