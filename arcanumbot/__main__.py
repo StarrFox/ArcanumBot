@@ -74,7 +74,7 @@ def main():
                      )
 
     # Todo: make sure to comment
-    bot.dispatch('ready')
+    # bot.dispatch('ready')
 
     bot.run()
 
