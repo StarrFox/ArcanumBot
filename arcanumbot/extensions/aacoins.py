@@ -151,6 +151,9 @@ class aacoins(commands.Cog):
             await ctx.send(f'\N{PARTY POPPER} you won {value} {ctx.bot.aacoin}s\n'
                            f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
 
+        elif value == 0:
+            return
+
         else:
             await ctx.send(f'{ctx.author.mention}, MasterMind timed out.', escape_mentions=False)
 

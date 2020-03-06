@@ -151,6 +151,16 @@ class MasterMindMenu(menus.Menu):
 
         await self.message.edit(content=self.console)
 
+        if self.tries == 0:
+            self.value = 0
+
+            await self.ctx.send(
+                f'Sorry {self.ctx.author.mention}, out of tries. The code was {self.code}.',
+                escape_mentions=True
+            )
+
+            self.stop()
+
     async def run(self, ctx) -> Optional[int]:
         await self.start(ctx, wait=True)
         return self.value
