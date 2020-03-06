@@ -79,7 +79,7 @@ class MasterMindMenu(menus.Menu):
         self.tries = 10
         self.value = None
         self.position = 0
-        self.entry = ['_'] * 4
+        self.entry = ['X'] * 5
         self.previous_tries = []
         self.code = self.get_code()
 
@@ -102,13 +102,17 @@ class MasterMindMenu(menus.Menu):
         res = [
             f'Tries left: {self.tries}',
             *self.previous_tries,
-            ''.join(self.entry)
+            ' '.join(self.entry)
         ]
         return '\n'.join(res)
 
     async def do_entry_button(self, payload):
-        if self.position == 4:
-            return await self.ctx.send(f'{self.ctx.author.mention}, Max entry reached.', delete_after=5)
+        if self.position == 5:
+            return await self.ctx.send(
+                f'{self.ctx.author.mention}, Max entry reached.',
+                delete_after=5,
+                escape_mentions=False
+            )
 
         self.entry[self.position] = payload.emoji.name
         self.position += 1
@@ -120,13 +124,16 @@ class MasterMindMenu(menus.Menu):
             return
 
         self.position -= 1
-        self.entry[self.position] = '_'
+        self.entry[self.position] = 'X'
         await self.message.edit(content=self.console)
 
     @menus.button(RETURN_ARROW, position=menus.Last(1))
     async def do_enter(self, _):
-        if self.position != 4:
-            return await self.ctx.send(f'{self.ctx.author.mention}, Entry not full.', delete_after=5)
+        if self.position != 5:
+            return await self.ctx.send(
+                f'{self.ctx.author.mention}, Entry not full.',
+                delete_after=5,
+                escape_mentions=False)
 
         if self.entry == self.code:
             self.value = 10 * self.tries
@@ -135,11 +142,12 @@ class MasterMindMenu(menus.Menu):
 
         dots = self.get_dots()
         self.previous_tries.append(
-            f"{''.join(self.entry)} => {dots}"
+            f"{' '.join(self.entry)} => {dots}"
         )
 
-        self.entry = ['_']*4
+        self.entry = ['X'] * 5
         self.position = 0
+        self.tries -= 1
 
         await self.message.edit(content=self.console)
 

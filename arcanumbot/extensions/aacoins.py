@@ -139,6 +139,7 @@ class aacoins(commands.Cog):
     async def aacoins_mastermind_game(self, ctx: SubContext):
         """
         Play a game of mastermind; can only be playd once a day.
+        Time outs count as games played.
         """
         game = MasterMindMenu()
         value = await game.run(ctx)
@@ -152,7 +153,6 @@ class aacoins(commands.Cog):
 
         else:
             await ctx.send(f'{ctx.author.mention}, MasterMind timed out.', escape_mentions=False)
-            raise Exception()
 
     @aacoins_mastermind_game.error
     async def on_aacoins_mastermind_game_error(self, ctx, error):
@@ -164,7 +164,6 @@ class aacoins(commands.Cog):
 
             return await ctx.send(f'You can play MasterMind again in {natural}.')
 
-        ctx.command.reset_cooldown(ctx)
 
 def setup(bot: ArcanumBot):
     bot.add_cog(aacoins(bot))
