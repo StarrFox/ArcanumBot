@@ -90,7 +90,7 @@ class MasterMindMenu(menus.Menu):
         return await ctx.send(
             f'Guess the code to win {ctx.bot.aacoin}s!'
             f'\nYou start with 100 and every guess removes 10.'
-            f'\nCode is 4 characters long can you guess it?'
+            f'\nCode is 5 characters long can you guess it?'
             f'\n\nControls:'
             f'\n1-5 enter that number in the entry box.'
             f'\n{LEFT_ARROW} backspace last number in entry box.'
@@ -135,7 +135,7 @@ class MasterMindMenu(menus.Menu):
                 delete_after=5,
                 escape_mentions=False)
 
-        if self.entry == self.code:
+        if ''.join(self.entry) == self.code:
             self.value = 10 * self.tries
             self.stop()
             return
