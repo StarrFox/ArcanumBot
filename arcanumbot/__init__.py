@@ -19,6 +19,6 @@ from pathlib import Path
 from . import checks, db
 from .menus import *
 from .bot import *
-from .games import EmojiGameMenu
+from .games import *
 
 ROOT = Path(__file__).parent

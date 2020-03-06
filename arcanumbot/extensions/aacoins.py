@@ -20,9 +20,9 @@ from datetime import timedelta
 
 import humanize
 from discord.ext import commands
-from discord_chan import NormalPageSource, DCMenuPages
+from discord_chan import NormalPageSource, DCMenuPages, SubContext
 
-from arcanumbot import checks, EmojiGameMenu, ArcanumBot
+from arcanumbot import checks, EmojiGameMenu, ArcanumBot, MasterMindMenu
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ class aacoins(commands.Cog):
 
     @commands.command(name='react')
     @commands.cooldown(1, 86400, commands.BucketType.user)
-    async def aacoins_react_game(self, ctx: commands.Context):
+    async def aacoins_react_game(self, ctx: SubContext):
         """
         Play a game of Emoji react; can only be played once a day.
         """
@@ -119,7 +119,7 @@ class aacoins(commands.Cog):
                            f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
 
         else:
-            await ctx.send(f'React timed out.')
+            await ctx.send(f'{ctx.author.mention}, React timed out.', escape_mentions=False)
             raise Exception()
 
     @aacoins_react_game.error
@@ -130,7 +130,39 @@ class aacoins(commands.Cog):
             delta = timedelta(seconds=error.retry_after)
             natural = humanize.naturaldelta(delta)
 
-            return await ctx.send(f'You can play react again in {natural}.')
+            return await ctx.send(f'You can play React again in {natural}.')
+
+        ctx.command.reset_cooldown(ctx)
+
+    @commands.command(name='mastermind')
+    @commands.cooldown(1, 86400, commands.BucketType.user)
+    async def aacoins_mastermind_game(self, ctx: SubContext):
+        """
+        Play a game of mastermind; can only be playd once a day.
+        """
+        game = MasterMindMenu()
+        value = await game.run(ctx)
+
+        if value:
+            current = await self.bot.get_aacoin_amount(ctx.author.id)
+            await self.bot.set_aacoins(ctx.author.id, current + value)
+
+            await ctx.send(f'\N{PARTY POPPER} you won {value} {ctx.bot.aacoin}s\n'
+                           f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
+
+        else:
+            await ctx.send(f'{ctx.author.mention}, MasterMind timed out.', escape_mentions=False)
+            raise Exception()
+
+    @aacoins_mastermind_game.error
+    async def on_aacoins_mastermind_game_error(self, ctx, error):
+        error = getattr(error, 'original', error)
+
+        if isinstance(error, commands.CommandOnCooldown):
+            delta = timedelta(seconds=error.retry_after)
+            natural = humanize.naturaldelta(delta)
+
+            return await ctx.send(f'You can play MasterMind again in {natural}.')
 
         ctx.command.reset_cooldown(ctx)
 
