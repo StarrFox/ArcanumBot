@@ -115,8 +115,10 @@ class aacoins(commands.Cog):
             current = await self.bot.get_aacoin_amount(ctx.author.id)
             await self.bot.set_aacoins(ctx.author.id, current + value)
 
-            await ctx.send(f'\N{PARTY POPPER} you won {value} {ctx.bot.aacoin}s\n'
-                           f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
+            await ctx.send(f'\N{PARTY POPPER} {ctx.author.mention} won {value} {ctx.bot.aacoin}s\n'
+                           f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}',
+                           escape_mentions=False
+                           )
 
         else:
             await ctx.send(f'{ctx.author.mention}, React timed out.', escape_mentions=False)
@@ -148,8 +150,10 @@ class aacoins(commands.Cog):
             current = await self.bot.get_aacoin_amount(ctx.author.id)
             await self.bot.set_aacoins(ctx.author.id, current + value)
 
-            await ctx.send(f'\N{PARTY POPPER} you won {value} {ctx.bot.aacoin}s\n'
-                           f'you now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}')
+            await ctx.send(f'\N{PARTY POPPER} {ctx.author.mention} won {value} {ctx.bot.aacoin}s\n'
+                           f'they now have a total of {await self.bot.get_aacoin_amount(ctx.author.id)}',
+                           escape_mentions=False
+                           )
 
         elif value == 0:
             return

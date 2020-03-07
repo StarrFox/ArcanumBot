@@ -89,11 +89,13 @@ class MasterMindMenu(menus.Menu):
     async def send_initial_message(self, ctx, channel):
         return await ctx.send(
             f'Guess the code to win {ctx.bot.aacoin}s!'
-            f'\nYou start with 100 and every guess removes 10.'
-            f'\nCode is 5 characters long can you guess it?'
+            f'\nYou start with 1000 and every guess removes 100.'
+            f'\n{YELLOW_CIRCLE} means the emoji is used in the code but in a different position.'
+            f'\n{GREEN_CIRCLE} means the emoji is correct and in the correct position.'
+            f'\nCode is 5 emojis can you guess it?'
             f'\n\nControls:'
-            f'\n1-5 enter that number in the entry box.'
-            f'\n{LEFT_ARROW} backspace last number in entry box.'
+            f'\n<emoji> enter that emoji in the entry box.'
+            f'\n{LEFT_ARROW} backspace last emoji in entry box.'
             f'\n{RETURN_ARROW} enters guess.'
         )
 
@@ -136,7 +138,7 @@ class MasterMindMenu(menus.Menu):
                 escape_mentions=False)
 
         if ''.join(self.entry) == self.code:
-            self.value = 10 * self.tries
+            self.value = 100 * self.tries
             self.stop()
             return
 
@@ -156,7 +158,7 @@ class MasterMindMenu(menus.Menu):
 
             await self.ctx.send(
                 f'Sorry {self.ctx.author.mention}, out of tries. The code was {self.code}.',
-                escape_mentions=True
+                escape_mentions=False
             )
 
             self.stop()
