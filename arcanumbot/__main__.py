@@ -16,9 +16,10 @@
 
 import asyncio
 import logging
+from pathlib import Path
 from configparser import ConfigParser
 
-from arcanumbot import ArcanumBot, ROOT, db
+from arcanumbot import ArcanumBot, db
 from discord.ext.commands import when_mentioned_or
 
 BASECONFIG = """
@@ -50,7 +51,7 @@ async def create_tables():
         await connection.commit()
 
 def main():
-    config_file = ROOT / 'arcanum.ini'
+    config_file = Path('arcanum.ini')
     if not config_file.exists():
         config_file.touch()
         config_file.write_text(BASECONFIG.strip())
