@@ -16,9 +16,7 @@
 
 import discord
 import logging
-from datetime import timedelta
 
-import humanize
 from discord.ext import commands
 from discord_chan import NormalPageSource, DCMenuPages, SubContext
 
@@ -34,12 +32,12 @@ class IsOnCooldown(commands.CommandError):
 def is_on_cooldown(command_name):
     async def predicate(ctx):
         if await ctx.bot.is_on_cooldown(command_name, ctx.author.id):
-            return True
-
-        else:
             raise IsOnCooldown(
                 f'Sorry {ctx.author.mention}, you can play {command_name} again at midnight CST.'
             )
+
+        else:
+            return True
 
     return commands.check(predicate)
 
