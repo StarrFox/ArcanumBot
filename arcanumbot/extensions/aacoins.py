@@ -32,7 +32,7 @@ class IsOnCooldown(commands.CommandError):
 
 
 def is_on_cooldown(command_name):
-    def predicate(ctx):
+    async def predicate(ctx):
         if await ctx.bot.is_on_cooldown(command_name, ctx.author.id):
             return True
 
