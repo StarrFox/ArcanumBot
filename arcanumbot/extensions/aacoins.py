@@ -163,7 +163,7 @@ class aacoins(commands.Cog):
                            escape_mentions=False
                            )
 
-        elif value is None:
+        elif value == 0:
             return
 
         else:

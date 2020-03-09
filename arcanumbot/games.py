@@ -92,6 +92,7 @@ class MasterMindMenu(menus.Menu):
             f'\nYou start with 1000 and every guess removes 100.'
             f'\n{YELLOW_CIRCLE} means the emoji is used in the code but in a different position.'
             f'\n{GREEN_CIRCLE} means the emoji is correct and in the correct position.'
+            f'\n**Circles are not ordered.**'
             f'\nCode is 5 emojis can you guess it?'
             f'\n\nControls:'
             f'\n<emoji> enter that emoji in the entry box.'
@@ -103,6 +104,7 @@ class MasterMindMenu(menus.Menu):
     def console(self) -> str:
         res = [
             f'Tries left: {self.tries}',
+            '**Note: Circles are not ordered.**',
             *self.previous_tries,
             ' '.join(self.entry)
         ]
