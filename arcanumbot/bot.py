@@ -160,7 +160,7 @@ class ArcanumBot(DiscordChan):
     async def is_on_cooldown(command_name, user_id) -> bool:
         async with db.get_database() as connection:
             cursor = await connection.execute(
-                'SELECT FROM cooldowns WHERE command_name = (?) AND user_id = (?);',
+                'SELECT * FROM cooldowns WHERE command_name = (?) AND user_id = (?);',
                 (command_name, user_id)
             )
 
