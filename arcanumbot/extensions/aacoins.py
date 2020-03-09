@@ -26,6 +26,24 @@ from arcanumbot import checks, EmojiGameMenu, ArcanumBot, MasterMindMenu
 
 logger = logging.getLogger(__name__)
 
+
+class IsOnCooldown(commands.CommandError):
+    pass
+
+
+def is_on_cooldown(command_name):
+    def predicate(ctx):
+        if await ctx.bot.is_on_cooldown(command_name, ctx.author.id):
+            return True
+
+        else:
+            raise IsOnCooldown(
+                f'Sorry {ctx.author.mention}, you can play {command_name} again at midnight CST.'
+            )
+
+    return commands.check(predicate)
+
+
 class aacoins(commands.Cog):
 
     def __init__(self, bot: ArcanumBot):
@@ -103,7 +121,7 @@ class aacoins(commands.Cog):
         await ctx.send(message)
 
     @commands.command(name='react')
-    @commands.cooldown(1, 86400, commands.BucketType.user)
+    @is_on_cooldown('React')
     async def aacoins_react_game(self, ctx: SubContext):
         """
         Play a game of Emoji react; can only be played once a day.
@@ -124,20 +142,12 @@ class aacoins(commands.Cog):
             await ctx.send(f'{ctx.author.mention}, React timed out.', escape_mentions=False)
             raise Exception()
 
-    @aacoins_react_game.error
-    async def on_aacoins_react_game_error(self, ctx, error):
-        error = getattr(error, 'original', error)
-
-        if isinstance(error, commands.CommandOnCooldown):
-            delta = timedelta(seconds=error.retry_after)
-            natural = humanize.naturaldelta(delta)
-
-            return await ctx.send(f'You can play React again in {natural}.')
-
-        ctx.command.reset_cooldown(ctx)
+    @aacoins_react_game.after_invoke
+    async def after_aacoins_mastermind_game(self, ctx: commands.Context):
+        await ctx.bot.set_cooldown('React', ctx.author.id)
 
     @commands.command(name='mastermind')
-    @commands.cooldown(1, 86400, commands.BucketType.user)
+    @is_on_cooldown('MasterMind')
     async def aacoins_mastermind_game(self, ctx: SubContext):
         """
         Play a game of mastermind; can only be playd once a day.
@@ -155,21 +165,26 @@ class aacoins(commands.Cog):
                            escape_mentions=False
                            )
 
-        elif value == 0:
+        elif value is None:
             return
 
         else:
             await ctx.send(f'{ctx.author.mention}, MasterMind timed out.', escape_mentions=False)
 
+    @aacoins_mastermind_game.after_invoke
+    async def after_aacoins_mastermind_game(self, ctx: commands.Context):
+        await ctx.bot.set_cooldown('MasterMind', ctx.author.id)
+
     @aacoins_mastermind_game.error
-    async def on_aacoins_mastermind_game_error(self, ctx, error):
+    @aacoins_react_game.error
+    async def on_aacoins_mastermind_game_error(self, ctx: SubContext, error):
         error = getattr(error, 'original', error)
 
-        if isinstance(error, commands.CommandOnCooldown):
-            delta = timedelta(seconds=error.retry_after)
-            natural = humanize.naturaldelta(delta)
+        if isinstance(error, IsOnCooldown):
+            await ctx.send(str(error), escape_mentions=False)
 
-            return await ctx.send(f'You can play MasterMind again in {natural}.')
+        elif isinstance(error, commands.CommandError):
+            await ctx.send(str(error))
 
 
 def setup(bot: ArcanumBot):

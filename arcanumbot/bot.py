@@ -134,3 +134,34 @@ class ArcanumBot(DiscordChan):
             await connection.commit()
 
         logger.info(f'Set coin account {user_id} to {amount}.')
+
+    @staticmethod
+    async def set_cooldown(command_name, user_id):
+        async with db.get_database() as connection:
+            await connection.execute(
+                'INSERT INTO cooldowns (command_name, user_id) VALUES (?, ?);',
+                (command_name, user_id)
+            )
+
+            await connection.commit()
+
+        logger.info(f'Set cooldown for {user_id} for command {command_name}.')
+
+    @staticmethod
+    async def clear_cooldowns():
+        async with db.get_database() as connection:
+            await connection.execute('DELETE FROM cooldowns;')
+
+            await connection.commit()
+
+        logger.info('Reset cooldowns.')
+
+    @staticmethod
+    async def is_on_cooldown(command_name, user_id) -> bool:
+        async with db.get_database() as connection:
+            cursor = await connection.execute(
+                'SELECT FROM cooldowns WHERE command_name = (?) AND user_id = (?);',
+                (command_name, user_id)
+            )
+
+            return bool(await cursor.fetchone())

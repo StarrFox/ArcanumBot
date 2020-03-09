@@ -41,6 +41,12 @@ CREATE TABLE IF NOT EXISTS "coins" (
     "coins"	INTEGER,
     PRIMARY KEY("user_id")
 );
+
+CREATE TABLE IF NOT EXISTS "cooldowns" (
+    "command_name" TEXT,
+    "user_id" INTEGER,
+    PRIMARY KEY("command_name", "user_id")
+);
 """
 
 
