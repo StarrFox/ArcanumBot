@@ -47,6 +47,11 @@ CREATE TABLE IF NOT EXISTS "cooldowns" (
     "user_id" INTEGER,
     PRIMARY KEY("command_name", "user_id")
 );
+
+CREATE TABLE IF NOT EXISTS "purple_hearts" (
+    "user_id" INTEGER,
+    PRIMARY KEY("user_id")
+);
 """
 
 

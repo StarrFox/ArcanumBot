@@ -1,18 +1,18 @@
 ﻿# -*- coding: utf-8 -*-
 #  Copyright © 2020 StarrFox
 #
-#  Discord Chan is free software: you can redistribute it and/or modify
+#  ArcanumBot is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as published
 #  by the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
 #
-#  Discord Chan is distributed in the hope that it will be useful,
+#  ArcanumBot is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Affero General Public License for more details.
 #
 #  You should have received a copy of the GNU Affero General Public License
-#  along with Discord Chan.  If not, see <https://www.gnu.org/licenses/>.
+#  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
 from datetime import datetime, timedelta
@@ -38,7 +38,7 @@ class Cooldowns(commands.Cog):
         await self.bot.clear_cooldowns()
 
     @cooldown_cycle.before_loop
-    async def presence_cycle_before(self):
+    async def cooldown_cycle_before(self):
         await self.bot.wait_until_ready()
 
         cst = datetime.utcnow() - timedelta(hours=5)
@@ -46,7 +46,7 @@ class Cooldowns(commands.Cog):
         await sleep_until(cst + timedelta(hours=24 - current_hour))
 
     @cooldown_cycle.after_loop
-    async def presence_cycle_after(self):
+    async def cooldown_cycle_after(self):
         if self.cooldown_cycle.failed():
             logger.critical('Cooldown cycle somehow errored out, restarting.', exc_info=True)
             self.cooldown_cycle.restart()

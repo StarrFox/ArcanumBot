@@ -165,3 +165,25 @@ class ArcanumBot(DiscordChan):
             )
 
             return bool(await cursor.fetchone())
+
+    @staticmethod
+    async def set_purple_heart(user_id):
+        async with db.get_database() as connection:
+            await connection.execute(
+                'INSERT INTO purple_heart (user_id) VALUES (?);',
+                (user_id,)
+            )
+
+            await connection.commit()
+
+        logger.info(f'Set purple heart for {user_id}')
+
+    @staticmethod
+    async def is_purple_heart(user_id) -> bool:
+        async with db.get_database() as connection:
+            cursor = await connection.execute(
+                'SELECT * FROM purple_heart WHERE user_id = (?);',
+                (user_id,)
+            )
+
+            return bool(await cursor.fetchone())
