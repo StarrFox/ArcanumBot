@@ -19,6 +19,8 @@ from contextlib import suppress
 from asyncio import CancelledError, create_task
 
 import discord
+from discord.ext import commands
+
 from discord_chan import DiscordChan
 
 from . import db, ConfirmDeleteMenu, MockContext
@@ -37,6 +39,7 @@ class ArcanumBot(DiscordChan):
         self.guild = None
         self.prompt_tasks = []
         self.logging_channel = None
+        self.add_check(self.only_one_guild)
 
     # # Todo: remove before going into prod
     # async def start(self, *args, **kwargs):
@@ -64,6 +67,16 @@ class ArcanumBot(DiscordChan):
             self.load_extensions_from_dir('arcanumbot/extensions')
 
         logger.info(f'Bot ready with {len(self.extensions.keys())} extensions.')
+
+    async def only_one_guild(self, ctx: commands.Context):
+        if not ctx.guild:
+            raise commands.NoPrivateMessage(f'Please use commands in {self.guild}.')
+
+        return True
+
+    async def refresh_guild(self):
+        self.guild = self.get_guild(self.guild.id)
+        return self.guild
 
     async def validate_coins(self):
         async with db.get_database() as connection:

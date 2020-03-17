@@ -55,6 +55,7 @@ class Events(commands.Cog):
                                       PURPLE_HEART):
             return
 
+        await self.bot.refresh_guild()
         member = self.bot.guild.get_member(payload.user_id)
 
         if member:
@@ -65,7 +66,7 @@ class Events(commands.Cog):
             logger.critical(msg)
 
             if self.bot.logging_channel:
-                await self.bot.logging_channel(msg)
+                await self.bot.logging_channel.send(msg)
 
     async def on_large_red_circle(self, member: discord.Member):
         announcments_role = self.bot.guild.get_role(ANNOUNCMENTS)

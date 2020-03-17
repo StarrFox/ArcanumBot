@@ -31,7 +31,7 @@ YODALINKS = [
     url_base + '480856274289033247/651635224395907072/960x0-2.jpg',
 ]
 
-class Fun(commands.Cog, name='fun'):
+class General(commands.Cog, name='general'):
 
     @commands.command()
     async def yoda(self, ctx: commands.Context):
@@ -42,6 +42,13 @@ class Fun(commands.Cog, name='fun'):
         embed.set_image(url=random.choice(YODALINKS))
         await ctx.send(embed=embed)
 
+    @commands.command()
+    async def ping(self, ctx: commands.Context):
+        """
+        Sends the bot's websocket latency
+        """
+        await ctx.send(f"\N{TABLE TENNIS PADDLE AND BALL} {round(ctx.bot.latency * 1000)}ms")
+
 
 def setup(bot: commands.Bot):
-    bot.add_cog(Fun(bot))
+    bot.add_cog(General(bot))

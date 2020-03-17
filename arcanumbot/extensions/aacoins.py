@@ -33,7 +33,7 @@ def is_on_cooldown(command_name):
     async def predicate(ctx):
         if await ctx.bot.is_on_cooldown(command_name, ctx.author.id):
             raise IsOnCooldown(
-                f'Sorry {ctx.author.mention}, you can play {command_name} again at midnight CST.'
+                f'Sorry {ctx.author.display_name}, you can play {command_name} again at midnight CST.'
             )
 
         else:
@@ -172,17 +172,6 @@ class aacoins(commands.Cog):
     @aacoins_mastermind_game.after_invoke
     async def after_aacoins_mastermind_game(self, ctx: commands.Context):
         await ctx.bot.set_cooldown('MasterMind', ctx.author.id)
-
-    @aacoins_mastermind_game.error
-    @aacoins_react_game.error
-    async def on_aacoins_mastermind_game_error(self, ctx: SubContext, error):
-        error = getattr(error, 'original', error)
-
-        if isinstance(error, IsOnCooldown):
-            await ctx.send(str(error), escape_mentions=False)
-
-        elif isinstance(error, commands.CommandError):
-            await ctx.send(str(error))
 
 
 def setup(bot: ArcanumBot):

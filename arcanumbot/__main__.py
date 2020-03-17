@@ -83,6 +83,8 @@ def main():
         level=logging.INFO
     )
 
+    logging.getLogger('discord').setLevel(logging.ERROR)
+
     loop = asyncio.get_event_loop()
 
     loop.create_task(create_tables())
@@ -93,6 +95,7 @@ def main():
                      )
 
     bot.load_extension('jishaku')
+    bot.load_extension('discord_chan.extensions.internals.error_handler')
 
     # Todo: make sure to comment
     # bot.dispatch('ready')
