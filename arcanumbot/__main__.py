@@ -52,6 +52,13 @@ CREATE TABLE IF NOT EXISTS "purple_hearts" (
     "user_id" INTEGER,
     PRIMARY KEY("user_id")
 );
+
+CREATE TABLE IF NOT EXISTS "coins_stats" (
+    "source" TEXT,
+    "user_id" INTEGER,
+    "time" TIMESTAMP,
+    "amount" INTEGER
+);
 """
 
 
