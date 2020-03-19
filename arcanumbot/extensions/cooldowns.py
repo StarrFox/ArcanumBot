@@ -44,13 +44,13 @@ class Cooldowns(commands.Cog):
     async def cooldown_cycle_before(self):
         await self.bot.wait_until_ready()
 
-        cst = datetime.utcnow().replace(tzinfo=timezone(-timedelta(hours=5)))
+        cst = datetime.utcnow().astimezone(timezone(-timedelta(hours=5)))
 
         midnight_cst = cst + timedelta(hours=24 - cst.hour) - timedelta(minutes=cst.minute,
                                                                         seconds=cst.second,
                                                                         microseconds=cst.microsecond)
 
-        midnight_cst_as_utc = midnight_cst.replace(tzinfo=timezone.utc)
+        midnight_cst_as_utc = midnight_cst.astimezone(timezone.utc)
 
         await sleep_until(midnight_cst_as_utc)
 
