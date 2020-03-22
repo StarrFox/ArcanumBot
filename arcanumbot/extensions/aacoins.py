@@ -119,6 +119,7 @@ class aacoins(commands.Cog):
         await ctx.send(message)
 
     @commands.command(name='react')
+    @commands.max_concurrency(1, commands.BucketType.user)
     @is_on_cooldown('React')
     async def aacoins_react_game(self, ctx: SubContext):
         """
@@ -145,6 +146,7 @@ class aacoins(commands.Cog):
         await ctx.bot.set_cooldown('React', ctx.author.id)
 
     @commands.command(name='mastermind')
+    @commands.max_concurrency(1, commands.BucketType.user)
     @is_on_cooldown('MasterMind')
     async def aacoins_mastermind_game(self, ctx: SubContext):
         """
