@@ -15,9 +15,7 @@ setup(
         'aiosqlite',
         'discord.py',
         'jishaku',
-        'humanize'
-    ],
-    dependency_links=[
-        'git+https://github.com/StarrFox/Discord-chan'
+        'humanize',
+        'discord-chan @ git+https://github.com/StarrFox/Discord-chan'
     ]
 )
