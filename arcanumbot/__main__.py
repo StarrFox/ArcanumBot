@@ -16,11 +16,12 @@
 
 import asyncio
 import logging
-from pathlib import Path
 from configparser import ConfigParser
+from pathlib import Path
+
+from discord.ext.commands import when_mentioned_or
 
 from arcanumbot import ArcanumBot, db
-from discord.ext.commands import when_mentioned_or
 
 BASECONFIG = """
 [general]

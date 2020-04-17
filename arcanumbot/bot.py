@@ -15,12 +15,11 @@
 #  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from contextlib import suppress
 from asyncio import CancelledError, create_task
+from contextlib import suppress
 
 import discord
 from discord.ext import commands
-
 from discord_chan import DiscordChan
 
 from . import db, ConfirmDeleteMenu, MockContext

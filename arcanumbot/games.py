@@ -19,7 +19,6 @@ from typing import Optional
 
 from discord.ext import menus
 
-
 VARIATION_SELECTOR = '\N{VARIATION SELECTOR-16}'
 
 EMOJI_LIST = [

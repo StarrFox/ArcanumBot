@@ -15,10 +15,10 @@
 #  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from datetime import datetime, timedelta, timezone
+from asyncio import sleep
 
+import pendulum
 from discord.ext import commands, tasks
-from discord.utils import sleep_until
 
 from arcanumbot import ArcanumBot
 
@@ -44,15 +44,16 @@ class Cooldowns(commands.Cog):
     async def cooldown_cycle_before(self):
         await self.bot.wait_until_ready()
 
-        cst = datetime.utcnow().astimezone(timezone(-timedelta(hours=5)))
+        cst = pendulum.now('America/Chicago')
+        cst_midnight = cst.replace(hour=23, minute=0, second=0, microsecond=0)
 
-        midnight_cst = cst + timedelta(hours=24 - cst.hour) - timedelta(minutes=cst.minute,
-                                                                        seconds=cst.second,
-                                                                        microseconds=cst.microsecond)
+        # noinspection PyTypeChecker
+        diff = cst.diff(cst_midnight)
+        total_seconds = diff.total_seconds()
 
-        midnight_cst_as_utc = midnight_cst.astimezone(timezone.utc)
+        logger.info(f'Cooldown cycle sleeping for {total_seconds} seconds.')
 
-        await sleep_until(midnight_cst_as_utc)
+        await sleep(total_seconds)
 
     @cooldown_cycle.after_loop
     async def cooldown_cycle_after(self):

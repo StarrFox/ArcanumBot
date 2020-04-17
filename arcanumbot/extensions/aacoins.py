@@ -14,9 +14,9 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
-import discord
 import logging
 
+import discord
 from discord.ext import commands
 from discord_chan import NormalPageSource, DCMenuPages, SubContext
 

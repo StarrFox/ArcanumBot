@@ -16,6 +16,7 @@ setup(
         'discord.py',
         'jishaku',
         'humanize',
-        'discord-chan @ git+https://github.com/StarrFox/Discord-chan'
+        'discord-chan @ git+https://github.com/StarrFox/Discord-chan',
+        'pendulum'
     ]
 )
