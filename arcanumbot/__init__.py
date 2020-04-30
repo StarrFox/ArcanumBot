@@ -17,8 +17,8 @@
 from pathlib import Path
 
 from . import checks, db
-from .bot import *
 from .games import *
 from .menus import *
+from .bot import *
 
 ROOT = Path(__file__).parent
