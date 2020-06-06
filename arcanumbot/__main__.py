@@ -19,8 +19,6 @@ import logging
 from configparser import ConfigParser
 from pathlib import Path
 
-from discord.ext.commands import when_mentioned_or
-
 from arcanumbot import ArcanumBot, db
 
 BASECONFIG = """
@@ -69,40 +67,37 @@ async def create_tables():
 
         await connection.commit()
 
+
 def main():
-    config_file = Path('arcanum.ini')
+    # Todo: use appdirs config
+    config_file = Path("arcanum.ini")
     if not config_file.exists():
         config_file.touch()
         config_file.write_text(BASECONFIG.strip())
-        exit('Config file made, fill out before running.')
+        exit("Config file made, fill out before running.")
 
     config = ConfigParser(allow_no_value=True, strict=False)
     config.read(config_file)
 
     logging.basicConfig(
-        format="[%(asctime)s] [%(levelname)s:%(name)s] %(message)s",
-        level=logging.INFO
+        format="[%(asctime)s] [%(levelname)s:%(name)s] %(message)s", level=logging.INFO
     )
 
-    logging.getLogger('discord').setLevel(logging.ERROR)
+    logging.getLogger("discord").setLevel(logging.ERROR)
 
     loop = asyncio.get_event_loop()
 
     loop.create_task(create_tables())
 
-    bot = ArcanumBot(config,
-                     command_prefix=when_mentioned_or(config['general']['prefix']),
-                     loop=loop
-                     )
+    bot = ArcanumBot(config)
 
-    bot.load_extension('jishaku')
-    bot.load_extension('discord_chan.extensions.internals.error_handler')
+    bot.load_extension("jishaku")
 
     # Todo: make sure to comment
-    # bot.dispatch('ready')
+    # bot.dispatch("ready")
 
     bot.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

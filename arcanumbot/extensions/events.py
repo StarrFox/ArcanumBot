@@ -21,9 +21,9 @@ from discord.ext import commands
 
 from arcanumbot import ArcanumBot
 
-LARGE_RED_CIRCLE = '\N{LARGE RED CIRCLE}'
-LARGE_BLUE_DIAMOND = '\N{LARGE BLUE DIAMOND}'
-PURPLE_HEART = '\N{PURPLE HEART}'
+LARGE_RED_CIRCLE = "\N{LARGE RED CIRCLE}"
+LARGE_BLUE_DIAMOND = "\N{LARGE BLUE DIAMOND}"
+PURPLE_HEART = "\N{PURPLE HEART}"
 
 TARGET_MESSAGE = 651847553633222666
 ANNOUNCMENTS = 651673435704918046
@@ -33,26 +33,29 @@ logger = logging.getLogger(__file__)
 
 
 class Events(commands.Cog):
-
     def __init__(self, bot: ArcanumBot):
         self.bot = bot
         self.reaction_map = {
             LARGE_RED_CIRCLE: self.on_large_red_circle,
             LARGE_BLUE_DIAMOND: self.on_large_blue_diamond,
-            PURPLE_HEART: self.on_purple_heart
+            PURPLE_HEART: self.on_purple_heart,
         }
 
     # Reaction event
 
-    @commands.Cog.listener('on_raw_reaction_add')
-    @commands.Cog.listener('on_raw_reaction_remove')
-    async def on_welcome_message_reaction(self, payload: discord.RawReactionActionEvent):
+    @commands.Cog.listener("on_raw_reaction_add")
+    @commands.Cog.listener("on_raw_reaction_remove")
+    async def on_welcome_message_reaction(
+        self, payload: discord.RawReactionActionEvent
+    ):
         if payload.message_id != TARGET_MESSAGE:
             return
 
-        if str(payload.emoji) not in (LARGE_RED_CIRCLE,
-                                      LARGE_BLUE_DIAMOND,
-                                      PURPLE_HEART):
+        if str(payload.emoji) not in (
+            LARGE_RED_CIRCLE,
+            LARGE_BLUE_DIAMOND,
+            PURPLE_HEART,
+        ):
             return
 
         await self.bot.refresh_guild()
@@ -62,7 +65,7 @@ class Events(commands.Cog):
             await self.reaction_map[str(payload.emoji)](member)
 
         else:
-            msg = f'{payload.user_id} could not be converted to member.'
+            msg = f"{payload.user_id} could not be converted to member."
             logger.critical(msg)
 
             if self.bot.logging_channel:
@@ -92,6 +95,7 @@ class Events(commands.Cog):
 
             await self.bot.set_aacoins(member.id, current + 100)
             await self.bot.set_purple_heart(member.id)
+
 
 def setup(bot: ArcanumBot):
     bot.add_cog(Events(bot))

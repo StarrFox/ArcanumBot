@@ -23,7 +23,7 @@ def is_coin_mod_or_above():
             return False
 
         coin_mod_role = ctx.guild.get_role(
-            ctx.bot.config['general'].getint('coin_mod_role_id')
+            ctx.bot.config["general"].getint("coin_mod_role_id")
         )
 
         # Different guild
