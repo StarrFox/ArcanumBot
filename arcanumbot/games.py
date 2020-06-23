@@ -117,15 +117,13 @@ class MasterMindMenu(menus.Menu):
         if self.position == 5:
             return await self.ctx.send(
                 f"{self.ctx.author.mention}, Max entry reached.",
-                delete_after=5,
-                escape_mentions=False,
+                delete_after=5
             )
 
         if payload.emoji.name in self.entry:
             return await self.ctx.send(
                 f"{self.ctx.author.mention}, No duplicate emojis.",
-                delete_after=5,
-                escape_mentions=False,
+                delete_after=5
             )
 
         self.entry[self.position] = payload.emoji.name
@@ -146,8 +144,7 @@ class MasterMindMenu(menus.Menu):
         if self.position != 5:
             return await self.ctx.send(
                 f"{self.ctx.author.mention}, Entry not full.",
-                delete_after=5,
-                escape_mentions=False,
+                delete_after=5
             )
 
         if "".join(self.entry) == self.code:
@@ -168,8 +165,7 @@ class MasterMindMenu(menus.Menu):
             self.value = 0
 
             await self.ctx.send(
-                f"Sorry {self.ctx.author.mention}, out of tries. The code was {self.code}.",
-                escape_mentions=False,
+                f"Sorry {self.ctx.author.mention}, out of tries. The code was {self.code}."
             )
 
             self.stop()
