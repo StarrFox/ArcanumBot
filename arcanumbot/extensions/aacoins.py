@@ -138,7 +138,7 @@ class aacoins(commands.Cog):
         message = f"Cleared {member}'s {ctx.bot.aacoin} balance"
         await ctx.send(message)
 
-    @commands.command(name="cooldown-reset")
+    @commands.command(name="cooldown-reset", aliases=["cr"])
     @checks.is_coin_mod_or_above()
     async def cooldown_reset(
         self, ctx: SubContext, identifier: str, member: discord.Member
@@ -148,6 +148,8 @@ class aacoins(commands.Cog):
                 "DELETE FROM cooldowns WHERE command_name = (?) AND user_id = (?);",
                 (identifier, member.id),
             )
+
+            await conn.commit()
 
         await ctx.send("reset.")
 
