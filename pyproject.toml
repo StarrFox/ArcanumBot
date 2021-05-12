@@ -12,7 +12,6 @@ jishaku = "1.19.2.202"
 pendulum = "^2.1.2"
 numpy = "^1.20.3"
 reusables = "^0.9.6"
-"discord.py" = {git = "https://github.com/Rapptz/discord.py@refs/pull/1849/merge"}
 
 [tool.poetry.dev-dependencies]
 
