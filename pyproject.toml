@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "arcanumbot"
+version = "1.1.0"
+description = ""
+authors = ["StarrFox <starrfox6312@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aiosqlite = "^0.17.0"
+jishaku = "1.19.2.202"
+pendulum = "^2.1.2"
+numpy = "^1.20.3"
+reusables = "^0.9.6"
+"discord.py" = {git = "https://github.com/Rapptz/discord.py@refs/pull/1849/merge"}
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
