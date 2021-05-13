@@ -31,7 +31,6 @@ from arcanumbot import (
     NormalPageSource,
     MenuPages,
     ConfirmationMenu,
-    TypeRacer,
 )
 
 logger = logging.getLogger(__name__)
