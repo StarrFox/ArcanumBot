@@ -128,7 +128,7 @@ class aacoins(commands.Cog):
         message = f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance."
         await ctx.send(message)
 
-    @commands.command(name="clear")
+    @commands.command(name="clear_command")
     @checks.is_coin_mod_or_above()
     async def clear_aacoins(self, ctx: commands.Context, member: discord.Member):
         """
