@@ -14,6 +14,9 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
+import datetime
+
 from itertools import cycle
 from random import sample, shuffle
 from typing import Optional, Union, Tuple
@@ -21,6 +24,8 @@ from typing import Optional, Union, Tuple
 import discord
 import numpy
 from discord.ext import menus
+
+from arcanumbot import utils
 
 
 VARIATION_SELECTOR = "\N{VARIATION SELECTOR-16}"
@@ -280,23 +285,6 @@ class Connect4(menus.Menu):
         msg += "".join(self.numbers)
         return msg
 
-    # @property
-    # def embed(self):
-    #     """
-    #     The embed to send to discord
-    #     """
-    #     board_embed = discord.Embed(description=self.board_message)
-    #
-    #     if self.last_move is not None:
-    #         board_embed.add_field(name="Last move", value=self.last_move, inline=False)
-    #
-    #     if self._running:
-    #         board_embed.add_field(
-    #             name="Current turn", value=self.current_player.mention
-    #         )
-    #
-    #     return board_embed
-
     @property
     def discord_message(self):
         final = ""
@@ -361,3 +349,51 @@ class Connect4(menus.Menu):
         """
         await self.start(ctx, wait=True)
         return self.winner
+
+
+# class TypeRacer:
+#     def __init__(self, bot, ctx):
+#         self.target_sentence = self.get_words()
+#         self.bot = bot
+#         self.ctx = ctx
+#         self.start = None
+#
+#     @staticmethod
+#     def get_words():
+#         letters = "abcdef"
+#         return letters
+#
+#     async def wait_for_reply(self):
+#         def _message_check(msg):
+#             return all([msg.author == self.ctx.author, msg.channel == self.ctx.channel])
+#         try:
+#             message = await self.bot.wait_for("message", check=_message_check)
+#         except asyncio.TimeoutError:
+#             return "message timeout"
+#
+#         if message.content == self.target_sentence:
+#             time_diff = message.created_at - self.start
+#             adjusted = time_diff - datetime.timedelta(seconds=self.bot.latency)
+#             return f"won\n" \
+#                    f"message made at={message.created_at}\n" \
+#                    f"internal start={self.start}\n" \
+#                    f"time diff={time_diff} ({utils.detailed_human_time(time_diff.total_seconds())})\n" \
+#                    f"bot latency={self.bot.latency}S\n" \
+#                    f"adjusted time={adjusted} ({utils.detailed_human_time(adjusted.total_seconds())})"
+#
+#         else:
+#             return "wrong message"
+#
+#     async def run(self):
+#         await self.ctx.send(f'plz type "{self.target_sentence}" real quick')
+#
+#         def _typing_check(chl, usr, _):
+#             return all([chl == self.ctx.channel, usr == self.ctx.author])
+#
+#         try:
+#             channel, user, when = await self.bot.wait_for("typing", check=_typing_check)
+#         except asyncio.TimeoutError:
+#             return "typing timeout"
+#
+#         self.start = when
+#         return await self.wait_for_reply()

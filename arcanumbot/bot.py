@@ -143,7 +143,7 @@ class ArcanumBot(commands.Bot):
         async with db.get_database() as connection:
             cursor = await connection.execute("SELECT * FROM coins;")
             for user_id, amount in await cursor.fetchall():
-                member = self.guild.get_member(user_id)
+                member = self.guild.fetch_member(user_id)
                 if member is not None:
                     pass
                 else:

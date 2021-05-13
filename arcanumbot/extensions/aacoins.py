@@ -31,6 +31,7 @@ from arcanumbot import (
     NormalPageSource,
     MenuPages,
     ConfirmationMenu,
+    TypeRacer,
 )
 
 logger = logging.getLogger(__name__)
@@ -93,7 +94,7 @@ class aacoins(commands.Cog):
 
         entries = []
         for user_id, coins in lb:
-            member = self.bot.guild.get_member(user_id)
+            member = self.bot.guild.fetch_member(user_id)
             entries.append(f"{member}: {coins}")
 
         source = NormalPageSource(entries, per_page=10)
@@ -253,6 +254,11 @@ class aacoins(commands.Cog):
         else:
             await ctx.send("No one made a move.")
 
+    # @commands.command(name="typeracer")
+    # async def aacoins_typeracer(self, ctx: SubContext):
+    #     """help string"""
+    #     game = TypeRacer(self.bot, ctx)
+    #     await ctx.send(await game.run())
 
 def setup(bot: ArcanumBot):
     bot.add_cog(aacoins(bot))
