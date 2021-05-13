@@ -37,7 +37,7 @@ class ConfirmDeleteMenu(menus.Menu):
         self.response = None
 
     async def send_initial_message(self, ctx, channel):
-        starrfox = ctx.bot.guild.fetch_member(285148358815776768)
+        starrfox = await ctx.bot.guild.fetch_member(285148358815776768)
 
         try:
             user = await self.bot.fetch_user(self.user_id)

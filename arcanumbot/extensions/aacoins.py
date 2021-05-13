@@ -93,7 +93,7 @@ class aacoins(commands.Cog):
 
         entries = []
         for user_id, coins in lb:
-            member = self.bot.guild.fetch_member(user_id)
+            member = await self.bot.guild.fetch_member(user_id)
             entries.append(f"{member}: {coins}")
 
         source = NormalPageSource(entries, per_page=10)

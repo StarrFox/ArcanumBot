@@ -59,7 +59,7 @@ class Events(commands.Cog):
             return
 
         await self.bot.refresh_guild()
-        member = self.bot.guild.fetch_member(payload.user_id)
+        member = await self.bot.guild.fetch_member(payload.user_id)
 
         if member:
             await self.reaction_map[str(payload.emoji)](member)
