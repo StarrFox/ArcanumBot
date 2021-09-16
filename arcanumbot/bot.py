@@ -147,7 +147,12 @@ class ArcanumBot(commands.Bot):
         async with db.get_database() as connection:
             cursor = await connection.execute("SELECT * FROM coins;")
             for user_id, amount in await cursor.fetchall():
-                member = await self.guild.fetch_member(user_id)
+                try:
+                    member = await self.guild.fetch_member(user_id)
+                except discord.NotFound:
+                    self.prompt_tasks.append(create_task(self.prompt_delete(user_id)))
+                    return
+
                 if member is not None:
                     pass
                 else:
