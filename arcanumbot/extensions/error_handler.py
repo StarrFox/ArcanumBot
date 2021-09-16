@@ -48,7 +48,7 @@ async def on_command_error(ctx: commands.Context, error):
         return await ctx.send(f"Command on cooldown, retry in {natural}.")
 
     logger.error(
-        f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}"
+        f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
     )
 
     await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon.")

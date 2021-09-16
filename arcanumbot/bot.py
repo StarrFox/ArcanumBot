@@ -46,6 +46,7 @@ class ArcanumBot(commands.Bot):
                 type=discord.ActivityType.listening,
                 name=f"{config['general']['prefix']}help",
             ),
+            intents=discord.Intents.all(),
             **kwargs,
         )
         self.config = config
@@ -88,7 +89,10 @@ class ArcanumBot(commands.Bot):
 
             await self.validate_coins()
 
-        self.load_extensions_from_dir("arcanumbot/extensions")
+        res = self.load_extensions_from_dir("arcanumbot/extensions")
+
+        if not res:
+            self.load_extensions_from_dir("extensions")
 
         logger.info(f"Bot ready with {len(self.extensions.keys())} extensions.")
 

@@ -14,19 +14,13 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with ArcanumBot.  If not, see <https://www.gnu.org/licenses/>.
 
-import asyncio
-import datetime
-
 from itertools import cycle
 from random import sample, shuffle
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 import discord
 import numpy
 from discord.ext import menus
-
-from arcanumbot import utils
-
 
 VARIATION_SELECTOR = "\N{VARIATION SELECTOR-16}"
 

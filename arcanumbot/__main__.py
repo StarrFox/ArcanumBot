@@ -21,6 +21,7 @@ from pathlib import Path
 
 from arcanumbot import ArcanumBot, db
 
+
 BASECONFIG = """
 [general]
 prefix=aa!
@@ -33,6 +34,7 @@ load_extensions=true
 [discord]
 token=
 """
+
 
 DBSCHEMA = """
 CREATE TABLE IF NOT EXISTS "coins" (

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "arcanumbot"
-version = "1.1.0"
+version = "1.1.1"
 description = ""
 authors = ["StarrFox <starrfox6312@gmail.com>"]
 license = "MIT"
@@ -8,10 +8,13 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.8"
 aiosqlite = "^0.17.0"
-jishaku = "1.19.2.202"
+jishaku = "^2.3.0"
 pendulum = "^2.1.2"
 numpy = "^1.20.3"
 reusables = "^0.9.6"
+discord-ext-menus = {git = "https://github.com/Rapptz/discord-ext-menus"}
+"discord.py" = {git = "https://github.com/StarrFox/discord.py"}
+humanize = "^3.11.0"
 
 [tool.poetry.dev-dependencies]
 
