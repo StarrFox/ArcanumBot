@@ -150,12 +150,14 @@ class ArcanumBot(commands.Bot):
                 try:
                     member = await self.guild.fetch_member(user_id)
                 except discord.NotFound:
+                    logger.info(f"Deleted account {user_id} found in coin db")
                     self.prompt_tasks.append(create_task(self.prompt_delete(user_id)))
                     return
 
                 if member is not None:
                     pass
                 else:
+                    logger.info(f"left account {user_id} found in coin db")
                     self.prompt_tasks.append(create_task(self.prompt_delete(user_id)))
 
     async def prompt_delete(self, user_id):
