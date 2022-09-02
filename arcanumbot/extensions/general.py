@@ -56,5 +56,5 @@ class General(commands.Cog, name="general"):
         )
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(General(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(General(bot))

@@ -70,7 +70,7 @@ async def create_tables():
         await connection.commit()
 
 
-def main():
+async def _main():
     # Todo: use appdirs config
     config_file = Path("arcanum.ini")
     if not config_file.exists():
@@ -93,12 +93,17 @@ def main():
 
     bot = ArcanumBot(config)
 
-    bot.load_extension("jishaku")
+    await bot.load_extension("jishaku")
 
     # Todo: make sure to comment
     # bot.dispatch("ready")
 
-    bot.run()
+    await bot.start()
+
+
+# this is so I can do __main__:main in script definition
+def main():
+    asyncio.run(_main())
 
 
 if __name__ == "__main__":

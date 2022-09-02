@@ -54,9 +54,9 @@ async def on_command_error(ctx: commands.Context, error):
     await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon.")
 
 
-def setup(bot: commands.Bot):
+async def setup(bot: commands.Bot):
     bot.add_listener(on_command_error)
 
 
-def teardown(bot: commands.Bot):
+async def teardown(bot: commands.Bot):
     bot.remove_listener(on_command_error)

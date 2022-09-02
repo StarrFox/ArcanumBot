@@ -89,17 +89,20 @@ class ArcanumBot(commands.Bot):
 
             await self.validate_coins()
 
-        res = self.load_extensions_from_dir("arcanumbot/extensions")
+        res = await self.load_extensions_from_dir("arcanumbot/extensions")
 
         if not res:
-            self.load_extensions_from_dir("extensions")
+            await self.load_extensions_from_dir("extensions")
 
         logger.info(f"Bot ready with {len(self.extensions.keys())} extensions.")
 
     def run(self, *args, **kwargs):
         return super().run(self.config["discord"]["token"], *args, **kwargs)
 
-    def load_extensions_from_dir(self, path: Union[str, pathlib.Path]) -> int:
+    async def start(self, *args, **kwargs):
+        return await super().start(self.config["discord"]["token"], *args, **kwargs)
+
+    async def load_extensions_from_dir(self, path: Union[str, pathlib.Path]) -> int:
         """
         Loads any python files in a directory and it's children
         as extensions
@@ -127,7 +130,7 @@ class ArcanumBot(commands.Bot):
 
         for ext in extension_names:
             try:
-                self.load_extension(ext)
+                await self.load_extension(ext)
             except (commands.errors.ExtensionError, commands.errors.ExtensionFailed):
                 logger.exception("Failed loading " + ext)
 

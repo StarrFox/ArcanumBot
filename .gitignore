@@ -108,3 +108,5 @@ config.py
 
 # testing data
 aacoins.json
+
+.idea/

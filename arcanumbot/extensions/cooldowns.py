@@ -68,5 +68,5 @@ class Cooldowns(commands.Cog):
             self.cooldown_cycle.restart()
 
 
-def setup(bot: ArcanumBot):
-    bot.add_cog(Cooldowns(bot))
+async def setup(bot: ArcanumBot):
+    await bot.add_cog(Cooldowns(bot))

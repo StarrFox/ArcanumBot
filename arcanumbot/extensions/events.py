@@ -97,5 +97,5 @@ class Events(commands.Cog):
             await self.bot.set_purple_heart(member.id)
 
 
-def setup(bot: ArcanumBot):
-    bot.add_cog(Events(bot))
+async def setup(bot: ArcanumBot):
+    await bot.add_cog(Events(bot))

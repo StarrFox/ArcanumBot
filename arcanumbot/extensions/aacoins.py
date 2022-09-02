@@ -259,5 +259,6 @@ class aacoins(commands.Cog):
     #     game = TypeRacer(self.bot, ctx)
     #     await ctx.send(await game.run())
 
-def setup(bot: ArcanumBot):
-    bot.add_cog(aacoins(bot))
+
+async def setup(bot: ArcanumBot):
+    await bot.add_cog(aacoins(bot))
