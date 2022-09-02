@@ -56,17 +56,6 @@ class ArcanumBot(commands.Bot):
         self.logging_channel = None
         self.add_check(self.only_one_guild)
 
-    # # Todo: remove before going into prod
-    # async def start(self, *args, **kwargs):
-    #     # Todo: uncomment to run
-    #     # await super().start(*args, **kwargs)
-    #
-    #     # Temp replacement for self.connect
-    #     import asyncio
-    #
-    #     while not self.is_closed():
-    #         await asyncio.sleep(100)
-
     async def process_commands(self, message):
         if message.author.bot:
             return
@@ -214,6 +203,18 @@ class ArcanumBot(commands.Bot):
             )
 
             return await cursor.fetchall()
+
+    async def add_aacoins(self, user_id: int, amount: int) -> int:
+        balance = await self.get_aacoin_amount(user_id)
+        balance += amount
+        await self.set_aacoins(user_id, balance)
+        return balance
+
+    async def remove_aacoins(self, user_id: int, amount: int) -> int:
+        balance = await self.get_aacoin_amount(user_id)
+        balance -= amount
+        await self.set_aacoins(user_id, balance)
+        return balance
 
     @staticmethod
     async def set_aacoins(user_id, amount):
