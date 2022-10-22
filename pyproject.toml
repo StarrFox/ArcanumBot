@@ -10,10 +10,10 @@ python = "^3.8"
 aiosqlite = "^0.17.0"
 jishaku = "^2.5.1"
 pendulum = "^2.1.2"
-numpy = "^1.22.0"
+numpy = "^1.23.2"
 reusables = "^0.9.6"
 discord-ext-menus = {git = "https://github.com/Rapptz/discord-ext-menus"}
-humanize = "^3.11.0"
+humanize = "^4.3.0"
 "discord.py" = "^2.0.1"
 psutil = "^5.9.1"
 
