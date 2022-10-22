@@ -103,10 +103,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# secrets
-config.py
-
-# testing data
-aacoins.json
-
 .idea/
+
+arcanum.ini
+arcanumbot.db
