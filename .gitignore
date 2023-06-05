@@ -107,3 +107,6 @@ venv.bak/
 
 arcanum.ini
 arcanumbot.db
+
+.direnv
+result

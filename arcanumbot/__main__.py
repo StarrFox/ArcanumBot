@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS "coins_stats" (
 async def create_tables():
     async with db.get_database() as connection:
         await connection.executescript(DBSCHEMA.strip())
-
         await connection.commit()
 
 
@@ -79,13 +78,9 @@ async def _main():
 
     await bot.load_extension("jishaku")
 
-    # Todo: make sure to comment
-    # bot.dispatch("ready")
-
     await bot.start()
 
 
-# this is so I can do __main__:main in script definition
 def main():
     asyncio.run(_main())
 
