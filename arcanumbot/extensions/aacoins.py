@@ -5,16 +5,16 @@ import discord
 from discord.ext import commands
 
 from arcanumbot import (
-    checks,
-    EmojiGameMenu,
     ArcanumBot,
-    MasterMindMenu,
-    Connect4,
-    db,
-    SubContext,
-    NormalPageSource,
-    MenuPages,
     ConfirmationMenu,
+    Connect4,
+    EmojiGameMenu,
+    MasterMindMenu,
+    MenuPages,
+    NormalPageSource,
+    SubContext,
+    checks,
+    db,
 )
 
 logger = logging.getLogger(__name__)

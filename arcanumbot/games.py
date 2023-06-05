@@ -99,14 +99,12 @@ class MasterMindMenu(menus.Menu):
     async def do_entry_button(self, payload):
         if self.position == 5:
             return await self.ctx.send(
-                f"{self.ctx.author.mention}, Max entry reached.",
-                delete_after=5
+                f"{self.ctx.author.mention}, Max entry reached.", delete_after=5
             )
 
         if payload.emoji.name in self.entry:
             return await self.ctx.send(
-                f"{self.ctx.author.mention}, No duplicate emojis.",
-                delete_after=5
+                f"{self.ctx.author.mention}, No duplicate emojis.", delete_after=5
             )
 
         self.entry[self.position] = payload.emoji.name
@@ -126,8 +124,7 @@ class MasterMindMenu(menus.Menu):
     async def do_enter(self, _):
         if self.position != 5:
             return await self.ctx.send(
-                f"{self.ctx.author.mention}, Entry not full.",
-                delete_after=5
+                f"{self.ctx.author.mention}, Entry not full.", delete_after=5
             )
 
         if "".join(self.entry) == self.code:

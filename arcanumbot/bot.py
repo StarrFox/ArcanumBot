@@ -7,13 +7,12 @@ from typing import Union
 import discord
 from discord.ext import commands
 
-from . import db, ConfirmDeleteMenu, MockContext, SubContext
+from . import ConfirmDeleteMenu, MockContext, SubContext, db
 
 logger = logging.getLogger(__name__)
 
 
 class ArcanumBot(commands.Bot):
-
     aacoin = discord.PartialEmoji(name="aacoin", id=649846878636212234)
 
     def __init__(self, config, **kwargs):
@@ -94,7 +93,6 @@ class ArcanumBot(commands.Bot):
         extension_names = []
 
         for subpath in path.glob("**/[!_]*.py"):  # Ignore if starts with _
-
             parts = subpath.with_suffix("").parts
             if parts[0] == ".":
                 parts = parts[1:]

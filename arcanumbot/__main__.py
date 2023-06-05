@@ -5,7 +5,6 @@ from pathlib import Path
 
 from arcanumbot import ArcanumBot, db
 
-
 BASECONFIG = """
 [general]
 prefix=aa!

@@ -5,7 +5,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = {self, nixpkgs}: let
+  outputs = {
+    self,
+    nixpkgs,
+  }: let
     forAllSystems = function:
       nixpkgs.lib.genAttrs [
         "x86_64-linux"
@@ -19,8 +22,7 @@
         }
       );
     };
-  in
-  {
+  in {
     packages = forAllSystems (pkgs: {
       default = pkgs.poetry2nix.mkPoetryApplication {
         projectDir = ./.;
