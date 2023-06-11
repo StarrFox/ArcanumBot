@@ -77,7 +77,10 @@ class aacoins(commands.Cog):
 
         entries = []
         for user_id, coins in lb:
-            member = await self.bot.guild.fetch_member(user_id)
+            # attempt cache pull first
+            if (member := ctx.guild.get_member(user_id)) is None:
+                member = await self.bot.guild.fetch_member(user_id)
+
             entries.append(f"{member}: {coins}")
 
         source = NormalPageSource(entries, per_page=10)
@@ -160,7 +163,7 @@ class aacoins(commands.Cog):
             await ctx.send(f"{ctx.author.mention}, React timed out.")
 
     @aacoins_react_game.after_invoke
-    async def after_aacoins_mastermind_game(self, ctx: commands.Context):
+    async def after_aacoins_react_game(self, ctx: commands.Context):
         await ctx.bot.set_cooldown("React", ctx.author.id)
 
     @commands.command(name="mastermind")

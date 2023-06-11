@@ -7,7 +7,7 @@ from typing import Union
 import discord
 from discord.ext import commands
 
-from . import ConfirmDeleteMenu, MockContext, SubContext, db
+from . import ConfirmDeleteMenu, MockContext, SubContext, db, constants
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 class ArcanumBot(commands.Bot):
     aacoin = discord.PartialEmoji(name="aacoin", id=649846878636212234)
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(
-            command_prefix=kwargs.pop("command_prefix", config["general"]["prefix"]),
+            command_prefix=kwargs.pop("command_prefix", "aa/"),
             case_insensitive=kwargs.pop("case_insensitive", True),
             max_messages=kwargs.pop("max_messages", 10_000),
             help_command=kwargs.pop("help_command", commands.MinimalHelpCommand()),
@@ -27,12 +27,11 @@ class ArcanumBot(commands.Bot):
             ),
             activity=discord.Activity(
                 type=discord.ActivityType.listening,
-                name=f"{config['general']['prefix']}help",
+                name=f"aa/help",
             ),
             intents=discord.Intents.all(),
             **kwargs,
         )
-        self.config = config
         self.ready_once = False
         self.guild = None
         self.prompt_tasks = []
@@ -53,10 +52,10 @@ class ArcanumBot(commands.Bot):
 
         self.ready_once = True
 
-        self.guild = self.get_guild(self.config["general"].getint("guild_id"))
+        self.guild = self.get_guild(constants.guild_id)
         if self.guild:
             self.logging_channel = self.guild.get_channel(
-                self.config["general"].getint("logging_channel_id")
+                constants.logging_channel_id
             )
 
             await self.validate_coins()
@@ -67,12 +66,6 @@ class ArcanumBot(commands.Bot):
             await self.load_extensions_from_dir("extensions")
 
         logger.info(f"Bot ready with {len(self.extensions.keys())} extensions.")
-
-    def run(self, *args, **kwargs):
-        return super().run(self.config["discord"]["token"], *args, **kwargs)
-
-    async def start(self, *args, **kwargs):
-        return await super().start(self.config["discord"]["token"], *args, **kwargs)
 
     async def load_extensions_from_dir(self, path: Union[str, pathlib.Path]) -> int:
         """

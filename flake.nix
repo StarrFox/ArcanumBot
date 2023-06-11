@@ -9,11 +9,11 @@
     self,
     nixpkgs,
   }: let
-    forAllSystems = function:
-      nixpkgs.lib.genAttrs [
-        "x86_64-linux"
-        "aarch64-linux"
-      ] (system: function nixpkgs.legacyPackages.${system});
+    forAllSystems = nixpkgs.lib.genAttrs [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+    forAllPkgs = function: forAllSystems (system: function nixpkgs.legacyPackages.${system});
 
     overrides = self: super: {
       discord-ext-menus = super.discord-ext-menus.overridePythonAttrs (
@@ -23,7 +23,7 @@
       );
     };
   in {
-    packages = forAllSystems (pkgs: {
+    packages = forAllPkgs (pkgs: {
       default = pkgs.poetry2nix.mkPoetryApplication {
         projectDir = ./.;
         preferWheels = true;
@@ -34,7 +34,12 @@
       };
     });
 
-    devShells = forAllSystems (pkgs: {
+    nixosModules.default = import ./modules/arcanumbot.nix {
+      # packages.system is taken from pkgs.system
+      selfpkgs = self.packages;
+    };
+
+    devShells = forAllPkgs (pkgs: {
       default = pkgs.mkShell {
         name = "arcanumbot";
         packages = with pkgs; [poetry just alejandra black isort];

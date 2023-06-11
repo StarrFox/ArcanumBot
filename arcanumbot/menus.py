@@ -8,7 +8,7 @@ from discord.ext import commands, menus
 # This is super bad but /shrug
 @dataclass()
 class MockContext:
-    bot: commands.bot
+    bot: commands.Bot
     author: discord.User
     guild: discord.Guild
     channel: discord.TextChannel
