@@ -1,22 +1,41 @@
 import aiosqlite
 
 
-def get_database() -> aiosqlite.Connection:
-    """
-    Gets the arcanumbot database
-    :return: The db context manager
-    """
+DBSCHEMA = """
+CREATE TABLE IF NOT EXISTS "coins" (
+    "user_id" INTEGER UNIQUE,
+    "coins"	INTEGER,
+    PRIMARY KEY("user_id")
+);
 
-    def adapt_set(_set):
-        return ",".join(map(str, _set))
+CREATE TABLE IF NOT EXISTS "cooldowns" (
+    "command_name" TEXT,
+    "user_id" INTEGER,
+    PRIMARY KEY("command_name", "user_id")
+);
 
-    def convert_set(s):
-        return {i.decode() for i in s.split(b",")}
+CREATE TABLE IF NOT EXISTS "purple_hearts" (
+    "user_id" INTEGER,
+    PRIMARY KEY("user_id")
+);
+"""
 
-    import sqlite3
 
-    sqlite3.register_adapter(set, adapt_set)
+# temporary fix while migrating to postgres
+tables_inited = False
 
-    sqlite3.register_converter("pyset", convert_set)
 
-    return aiosqlite.connect("arcanumbot.db", detect_types=sqlite3.PARSE_DECLTYPES)
+async def create_tables():
+    if tables_inited:
+        return
+
+    async with (await get_database()) as connection:
+        await connection.executescript(DBSCHEMA.strip())
+        await connection.commit()
+
+    tables_inited = True
+
+
+async def get_database() -> aiosqlite.Connection:
+    await create_tables()
+    return aiosqlite.connect("arcanumbot.db")

@@ -149,14 +149,7 @@ class aacoins(commands.Cog):
     async def cooldown_reset(
         self, ctx: SubContext, member: discord.Member
     ):
-        async with db.get_database() as conn:
-            await conn.execute(
-                "DELETE FROM cooldowns WHERE user_id = (?);",
-                (member.id,),
-            )
-
-            await conn.commit()
-
+        await self.bot.clear_cooldowns_for_user(member.id)
         await ctx.send(f"Reset cooldowns for {member}")
 
     @commands.command(name="react")

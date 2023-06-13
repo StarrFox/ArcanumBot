@@ -15,7 +15,7 @@ class ArcanumBot(commands.Bot):
 
     def __init__(self, **kwargs):
         super().__init__(
-            command_prefix=kwargs.pop("command_prefix", "aa/"),
+            command_prefix=kwargs.pop("command_prefix", "aa!"),
             case_insensitive=kwargs.pop("case_insensitive", True),
             max_messages=kwargs.pop("max_messages", 10_000),
             help_command=kwargs.pop("help_command", commands.MinimalHelpCommand()),
@@ -25,13 +25,12 @@ class ArcanumBot(commands.Bot):
             ),
             activity=discord.Activity(
                 type=discord.ActivityType.listening,
-                name=f"aa/help",
+                name="aa!help",
             ),
             intents=discord.Intents.all(),
             **kwargs,
         )
         self.ready_once = False
-        self.prompt_tasks = []
         self.add_check(self.only_one_guild)
 
     @property
@@ -61,6 +60,14 @@ class ArcanumBot(commands.Bot):
 
         await self.invoke(ctx)
 
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        if before.content != after.content:
+            if after.guild and not isinstance(after.author, discord.Member):
+                # Cache bug, after.author is User while before.author is Member
+                after.author = await after.guild.fetch_member(after.author.id)
+
+            await self.process_commands(after)
+
     async def on_ready(self):
         if self.ready_once:
             return
@@ -68,6 +75,8 @@ class ArcanumBot(commands.Bot):
         self.ready_once = True
 
         await self.validate_coins()
+
+        await self.load_extension("jishaku")
 
         res = await self.load_extensions_from_dir("arcanumbot/extensions")
 
@@ -120,7 +129,7 @@ class ArcanumBot(commands.Bot):
 
     async def validate_coins(self):
         """Resyncs coin db with discord api status"""
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             cursor = await connection.execute("SELECT * FROM coins;")
             for user_id, amount in await cursor.fetchall():
                 try:
@@ -143,7 +152,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def delete_user_aacoins(user_id):
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             await connection.execute(
                 "DELETE FROM coins WHERE user_id = (?);", (user_id,)
             )
@@ -154,7 +163,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def get_aacoin_amount(user_id) -> int:
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             cursor = await connection.execute(
                 "SELECT coins FROM coins WHERE user_id = (?);", (user_id,)
             )
@@ -168,7 +177,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def get_aacoin_lb():
-        async with db.get_database() as connection:
+        async with (await db.get_database()) as connection:
             cursor = await connection.execute(
                 "SELECT user_id, coins FROM coins ORDER BY coins DESC;"
             )
@@ -189,7 +198,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def set_aacoins(user_id, amount):
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             await connection.execute(
                 "INSERT OR REPLACE INTO coins (user_id, coins) VALUES (?, ?);",
                 (user_id, amount),
@@ -201,7 +210,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def set_cooldown(command_name, user_id):
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             await connection.execute(
                 "INSERT INTO cooldowns (command_name, user_id) VALUES (?, ?);",
                 (command_name, user_id),
@@ -209,20 +218,27 @@ class ArcanumBot(commands.Bot):
 
             await connection.commit()
 
-        logger.info(f"Set cooldown for {user_id} for command {command_name}.")
+        logger.info(f"Set cooldown for {user_id} for command {command_name}")
 
     @staticmethod
     async def clear_cooldowns():
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             await connection.execute("DELETE FROM cooldowns;")
-
             await connection.commit()
 
-        logger.info("Reset cooldowns.")
+        logger.info("Reset cooldowns")
+
+    @staticmethod
+    async def clear_cooldowns_for_user(user_id: int):
+        async with (await db.get_database()) as connection:
+            await connection.execute("DELETE FROM cooldowns WHERE user_id = (?);", (user_id,))
+            await connection.commit()
+
+        logger.info(f"Reset cooldowns for {user_id}")
 
     @staticmethod
     async def is_on_cooldown(command_name, user_id) -> bool:
-        async with db.get_database() as connection:
+        async with (await db.get_database()) as connection:
             cursor = await connection.execute(
                 "SELECT * FROM cooldowns WHERE command_name = (?) AND user_id = (?);",
                 (command_name, user_id),
@@ -232,7 +248,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def set_purple_heart(user_id):
-        async with db.get_database() as connection:
+        async with (await db.get_database())  as connection:
             await connection.execute(
                 "INSERT INTO purple_hearts (user_id) VALUES (?);", (user_id,)
             )
@@ -243,7 +259,7 @@ class ArcanumBot(commands.Bot):
 
     @staticmethod
     async def is_purple_heart(user_id) -> bool:
-        async with db.get_database() as connection:
+        async with (await db.get_database()) as connection:
             cursor = await connection.execute(
                 "SELECT * FROM purple_hearts WHERE user_id = (?);", (user_id,)
             )
