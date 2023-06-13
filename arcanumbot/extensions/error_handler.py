@@ -18,7 +18,7 @@ async def on_command_error(ctx: commands.Context, error):
         if await ctx.bot.is_owner(ctx.author):
             await ctx.reinvoke()
             return
-        
+
         return await ctx.send("You don't have permission to run that command")
 
     # Reset cooldown when command doesn't finish
@@ -38,10 +38,10 @@ async def on_command_error(ctx: commands.Context, error):
 
     if ctx.command is not None:
         logger.error(
-            f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
+            f"Unhandled error in command {ctx.command.name} Invoke message: {ctx.message.content} {error=}"
         )
 
-    await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon.")
+    await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon")
 
 
 async def setup(bot: commands.Bot):

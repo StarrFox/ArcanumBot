@@ -1,4 +1,4 @@
-﻿from typing import Sequence, Optional
+﻿from typing import Optional, Sequence
 
 import discord
 from discord.ext import commands, menus

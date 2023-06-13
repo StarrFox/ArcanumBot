@@ -3,6 +3,7 @@ from random import choice
 from typing import Optional
 
 import discord
+import pendulum
 from discord.ext import commands
 
 from arcanumbot import (
@@ -32,8 +33,11 @@ class IsOnCooldown(commands.CommandError):
 def is_on_cooldown(command_name):
     async def predicate(ctx):
         if await ctx.bot.is_on_cooldown(command_name, ctx.author.id):
+            cst = pendulum.now("America/Chicago")
+            cst_midnight = cst.replace(hour=23, minute=0, second=0, microsecond=0)
+
             raise IsOnCooldown(
-                f"Sorry {ctx.author.display_name}, you can play {command_name} again at midnight CT."
+                f"Sorry {ctx.author.display_name}, you can play {command_name} again <t:{int(cst_midnight.timestamp())}:R> (midnight CT)."
             )
 
         else:
@@ -54,7 +58,9 @@ class aacoins(commands.Cog):
         coins = await self.bot.get_aacoin_amount(member.id)
 
         if coins:
-            logger.info(f"Dropping {member}({member.id}) from coins db; they had {coins} coins")
+            logger.info(
+                f"Dropping {member}({member.id}) from coins db; they had {coins} coins"
+            )
 
             await self.bot.delete_user_aacoins(member.id)
 
@@ -86,6 +92,9 @@ class aacoins(commands.Cog):
         View all aacoins sorted by amount.
         """
         lb = await self.bot.get_aacoin_lb()
+
+        if not lb:
+            return await ctx.send("No one has any coins right now")
 
         entries = []
         for user_id, coins in lb:
@@ -120,6 +129,9 @@ class aacoins(commands.Cog):
         """
         Add aacoins to a member.
         """
+        if amount < 1:
+            return await ctx.send("You can only add positive amounts of coins")
+
         await self.bot.add_aacoins(member.id, amount)
         await ctx.send(f"Added {amount} to {member}'s {ctx.bot.aacoin} balance.")
 
@@ -131,6 +143,9 @@ class aacoins(commands.Cog):
         """
         Remove aacoins from a member.
         """
+        if amount < 1:
+            return await ctx.send("You can only remove positive amounts of coins")
+
         await self.bot.remove_aacoins(member.id, amount)
         await ctx.send(f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance.")
 
@@ -146,9 +161,7 @@ class aacoins(commands.Cog):
 
     @commands.command(name="cooldown-reset", aliases=["cr"])
     @checks.is_coin_mod_or_above()
-    async def cooldown_reset(
-        self, ctx: SubContext, member: discord.Member
-    ):
+    async def cooldown_reset(self, ctx: SubContext, member: discord.Member):
         await self.bot.clear_cooldowns_for_user(member.id)
         await ctx.send(f"Reset cooldowns for {member}")
 

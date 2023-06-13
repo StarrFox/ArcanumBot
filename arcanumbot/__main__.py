@@ -23,7 +23,12 @@ os.environ["JISHAKU_RETAIN"] = "true"
 
 # TODO: create_tables is not called
 @click.command()
-@click.option("--secret", help="Path to secret file", type=click.Path(exists=True, dir_okay=False, path_type=Path), default="discord_token.secret")
+@click.option(
+    "--secret",
+    help="Path to secret file",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    default="discord_token.secret",
+)
 def main(secret: Path):
     logging.basicConfig(
         format="[%(asctime)s] [%(levelname)s:%(name)s] %(message)s", level=logging.INFO
