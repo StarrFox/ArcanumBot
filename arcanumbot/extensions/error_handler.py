@@ -14,11 +14,12 @@ async def on_command_error(ctx: commands.Context, error):
         return
 
     # Bypass checks for owner
-    elif isinstance(error, commands.CheckFailure) and await ctx.bot.is_owner(
-        ctx.author
-    ):
-        await ctx.reinvoke()
-        return
+    elif isinstance(error, commands.CheckFailure):
+        if await ctx.bot.is_owner(ctx.author):
+            await ctx.reinvoke()
+            return
+        
+        return await ctx.send("You don't have permission to run that command")
 
     # Reset cooldown when command doesn't finish
     elif isinstance(error, commands.CommandError) and not isinstance(

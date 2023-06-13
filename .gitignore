@@ -110,3 +110,5 @@ arcanumbot.db
 
 .direnv
 result
+
+discord_token.secret

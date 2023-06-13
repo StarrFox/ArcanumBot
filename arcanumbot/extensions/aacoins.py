@@ -54,12 +54,12 @@ class aacoins(commands.Cog):
         coins = await self.bot.get_aacoin_amount(member.id)
 
         if coins:
-            logger.info(f"Dropping {member} from coins db; they had {coins} coins")
+            logger.info(f"Dropping {member}({member.id}) from coins db; they had {coins} coins")
 
             await self.bot.delete_user_aacoins(member.id)
 
             await self.bot.logging_channel.send(
-                "Dropped {member}({member.id}) from coins db; they had {coins} coins"
+                f"Dropped {member}({member.id}) from coins db; they had {coins} coins"
             )
 
     @commands.group(name="coins", invoke_without_command=True)
@@ -91,7 +91,7 @@ class aacoins(commands.Cog):
         for user_id, coins in lb:
             assert ctx.guild is not None
             # attempt cache pull first
-            if (member := ctx.guild.get_channel(user_id)) is not None:
+            if (member := ctx.guild.get_member(user_id)) is not None:
                 entries.append(f"{member}: {coins}")
                 continue
 
@@ -120,10 +120,8 @@ class aacoins(commands.Cog):
         """
         Add aacoins to a member.
         """
-        current = await self.bot.get_aacoin_amount(member.id)
-        await self.bot.set_aacoins(member.id, current + amount)
-        message = f"Added {amount} to {member}'s {ctx.bot.aacoin} balance."
-        await ctx.send(message)
+        await self.bot.add_aacoins(member.id, amount)
+        await ctx.send(f"Added {amount} to {member}'s {ctx.bot.aacoin} balance.")
 
     @commands.command(name="remove", aliases=["rem"])
     @checks.is_coin_mod_or_above()
@@ -133,35 +131,33 @@ class aacoins(commands.Cog):
         """
         Remove aacoins from a member.
         """
-        current = await self.bot.get_aacoin_amount(member.id)
-        await self.bot.set_aacoins(member.id, current - amount)
-        message = f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance."
-        await ctx.send(message)
+        await self.bot.remove_aacoins(member.id, amount)
+        await ctx.send(f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance.")
 
-    @commands.command(name="clear_command")
+    @commands.command(name="clear")
     @checks.is_coin_mod_or_above()
     async def clear_aacoins(self, ctx: commands.Context, member: discord.Member):
         """
         Clear a member's aacoin(s).
         """
+        ammount = await self.bot.get_aacoin_amount(member.id)
         await self.bot.delete_user_aacoins(member.id)
-        message = f"Cleared {member}'s {ctx.bot.aacoin} balance"
-        await ctx.send(message)
+        await ctx.send(f"Cleared {member}'s {ctx.bot.aacoin} balance of {ammount}")
 
     @commands.command(name="cooldown-reset", aliases=["cr"])
     @checks.is_coin_mod_or_above()
     async def cooldown_reset(
-        self, ctx: SubContext, identifier: str, member: discord.Member
+        self, ctx: SubContext, member: discord.Member
     ):
         async with db.get_database() as conn:
             await conn.execute(
-                "DELETE FROM cooldowns WHERE command_name = (?) AND user_id = (?);",
-                (identifier, member.id),
+                "DELETE FROM cooldowns WHERE user_id = (?);",
+                (member.id,),
             )
 
             await conn.commit()
 
-        await ctx.send("reset.")
+        await ctx.send(f"Reset cooldowns for {member}")
 
     @commands.command(name="react")
     @commands.max_concurrency(1, commands.BucketType.user)

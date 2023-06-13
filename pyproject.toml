@@ -16,6 +16,7 @@ humanize = "^4.6.0"
 "discord.py" = "^2.2.3"
 psutil = "^5.9.5"
 click = "^8.1.3"
+uvloop = {version = "^0.17.0", markers = "platform_system == 'Linux'"}
 
 [tool.poetry.scripts]
 arcanumbot = "arcanumbot.__main__:main"

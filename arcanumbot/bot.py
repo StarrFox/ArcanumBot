@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class ArcanumBot(commands.Bot):
-    aacoin = discord.PartialEmoji(name="aacoin", id=649846878636212234)
+    aacoin = constants.aacoin_emoji
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -130,6 +130,7 @@ class ArcanumBot(commands.Bot):
                     logger.info(
                         f"Dropped [deleted] account {user_id} from coin db; had {amount} coins"
                     )
+                    await self.logging_channel.send(f"Dropped [deleted] account {user_id} from coin db; had {amount} coins")
                     continue
 
                 # None means the member has left
@@ -138,6 +139,7 @@ class ArcanumBot(commands.Bot):
                     logger.info(
                         f"Dropped [left] account {user_id} from coin db; had {amount} coins"
                     )
+                    await self.logging_channel.send(f"Dropped [left] account {user_id} from coin db; had {amount} coins")
 
     @staticmethod
     async def delete_user_aacoins(user_id):

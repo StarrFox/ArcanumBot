@@ -3,15 +3,15 @@
 import discord
 from discord.ext import commands
 
-from arcanumbot import ArcanumBot
+from arcanumbot import ArcanumBot, constants
 
 LARGE_RED_CIRCLE = "\N{LARGE RED CIRCLE}"
 LARGE_BLUE_DIAMOND = "\N{LARGE BLUE DIAMOND}"
 PURPLE_HEART = "\N{PURPLE HEART}"
 
-TARGET_MESSAGE = 651847553633222666
-ANNOUNCMENTS = 651673435704918046
-GIVEAWAYS = 519182542104952836
+TARGET_MESSAGE = constants.reaction_message
+ANNOUNCMENTS = constants.announcments_role
+GIVEAWAYS = constants.giveaways_role
 
 logger = logging.getLogger(__file__)
 
