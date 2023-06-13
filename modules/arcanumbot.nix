@@ -1,12 +1,14 @@
-{selfpkgs, ...}:
-{config, lib, pkgs, ...}:
-with lib;
-let
+{selfpkgs, ...}: {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.arcanumbot;
   defaultUser = "arcnaumbot";
   selfpkgs = selfpkgs.${pkgs.system};
-in
-{
+in {
   # used for debugging (show filename)
   _file = "arcanumbot.nix";
 
