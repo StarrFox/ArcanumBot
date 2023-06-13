@@ -1,8 +1,8 @@
-import os
-import pwd
 import asyncio
 import logging
-from typing import Optional, TYPE_CHECKING, NamedTuple
+import os
+import pwd
+from typing import TYPE_CHECKING, NamedTuple, Optional
 
 import asyncpg
 import discord
@@ -58,7 +58,7 @@ class Database:
         # A lock isnt needed here because .connect is already locked
         if self._ensured:
             return
-        
+
         self._ensured = True
 
         async with pool.acquire() as connection:
@@ -68,7 +68,7 @@ class Database:
         async with self._connection_lock:
             if self._connection is not None:
                 return self._connection
-            
+
             self._connection = await asyncpg.create_pool(
                 user=DATABASE_user, database=DATABASE_name
             )
@@ -121,7 +121,9 @@ class Database:
 
         async with pool.acquire() as connection:
             connection: asyncpg.Connection
-            row = await connection.fetchrow("SELECT * FROM coins WHERE user_id = $1;", user_id)
+            row = await connection.fetchrow(
+                "SELECT * FROM coins WHERE user_id = $1;", user_id
+            )
 
             if row is not None:
                 return row["coins"]
@@ -152,7 +154,7 @@ class Database:
             await connection.execute(
                 "INSERT INTO coins (user_id, coins) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET coins = EXCLUDED.coins;",
                 user_id,
-                amount
+                amount,
             )
 
         logger.info(f"Set coin account {user_id} to {amount}.")
@@ -161,7 +163,9 @@ class Database:
         current = await self.get_coin_balance(user_id)
         new_balance = current + amount
         if new_balance.bit_length() >= 64:
-            raise CommandError("New balance would be over int64, are you sure you need that many coins?")
+            raise CommandError(
+                "New balance would be over int64, are you sure you need that many coins?"
+            )
         await self.set_coins(user_id, new_balance)
         return new_balance
 
@@ -169,7 +173,9 @@ class Database:
         current = await self.get_coin_balance(user_id)
         new_balance = current - amount
         if new_balance.bit_length() >= 64:
-            raise CommandError("New balance would be over int64, are you sure you need that many coins?")
+            raise CommandError(
+                "New balance would be over int64, are you sure you need that many coins?"
+            )
         await self.set_coins(user_id, new_balance)
         return new_balance
 
@@ -181,7 +187,7 @@ class Database:
             await connection.execute(
                 "INSERT INTO cooldowns (command_name, user_id) VALUES ($1, $2);",
                 command_name,
-                user_id
+                user_id,
             )
 
         logger.info(f"Set cooldown for {user_id} for command {command_name}")
@@ -200,7 +206,9 @@ class Database:
 
         async with pool.acquire() as connection:
             connection: asyncpg.Connection
-            await connection.execute("DELETE FROM cooldowns WHERE user_id = $1;", user_id)
+            await connection.execute(
+                "DELETE FROM cooldowns WHERE user_id = $1;", user_id
+            )
 
         logger.info(f"Reset cooldowns for {user_id}")
 
@@ -209,7 +217,11 @@ class Database:
 
         async with pool.acquire() as connection:
             connection: asyncpg.Connection
-            row = await connection.fetchrow("SELECT * FROM cooldowns WHERE command_name = $1 AND user_id = $2;", command_name, user_id)
+            row = await connection.fetchrow(
+                "SELECT * FROM cooldowns WHERE command_name = $1 AND user_id = $2;",
+                command_name,
+                user_id,
+            )
             return row is not None
 
     async def set_purple_heart(self, user_id: int):
@@ -217,7 +229,9 @@ class Database:
 
         async with pool.acquire() as connection:
             connection: asyncpg.Connection
-            await connection.execute("INSERT INTO purple_hearts (user_id) VALUES ($1);", user_id)
+            await connection.execute(
+                "INSERT INTO purple_hearts (user_id) VALUES ($1);", user_id
+            )
 
         logger.info(f"Set purple heart for {user_id}")
 
@@ -226,5 +240,7 @@ class Database:
 
         async with pool.acquire() as connection:
             connection: asyncpg.Connection
-            row = await connection.fetchrow("SELECT * FROM purple_hearts WHERE user_id = $1;", user_id)
+            row = await connection.fetchrow(
+                "SELECT * FROM purple_hearts WHERE user_id = $1;", user_id
+            )
             return row is not None
