@@ -33,6 +33,7 @@ async def on_command_error(ctx: commands.Context, error):
     elif isinstance(error, commands.CommandOnCooldown):
         delta = timedelta(seconds=error.retry_after)
         natural = naturaldelta(delta)
+        # TODO: use pendulum for this so we can drop the humanize dependency
         return await ctx.send(f"Command on cooldown, retry in {natural}.")
 
     if ctx.command is not None:
