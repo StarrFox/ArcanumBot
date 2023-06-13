@@ -14,27 +14,32 @@ async def on_command_error(ctx: commands.Context, error):
         return
 
     # Bypass checks for owner
-    elif isinstance(error, commands.CheckFailure) and await ctx.bot.is_owner(
-        ctx.author
-    ):
-        await ctx.reinvoke()
-        return
+    elif isinstance(error, commands.CheckFailure):
+        if await ctx.bot.is_owner(ctx.author):
+            await ctx.reinvoke()
+            return
+        
+        return await ctx.send("You don't have permission to run that command")
 
     # Reset cooldown when command doesn't finish
     elif isinstance(error, commands.CommandError) and not isinstance(
         error, commands.CommandOnCooldown
     ):
-        ctx.command.reset_cooldown(ctx)
+        if ctx.command is not None:
+            ctx.command.reset_cooldown(ctx)
+
         return await ctx.send(str(error))
 
     elif isinstance(error, commands.CommandOnCooldown):
         delta = timedelta(seconds=error.retry_after)
         natural = naturaldelta(delta)
+        # TODO: use pendulum for this so we can drop the humanize dependency
         return await ctx.send(f"Command on cooldown, retry in {natural}.")
 
-    logger.error(
-        f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
-    )
+    if ctx.command is not None:
+        logger.error(
+            f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
+        )
 
     await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon.")
 

@@ -14,8 +14,7 @@ class Cooldowns(commands.Cog):
 
     def __init__(self, bot: ArcanumBot):
         self.bot = bot
-        # for some reason I have to do this, no idea why
-        # didn't feel like just making my own thing
+        # for some reason I have to do this instead of decorators, no idea why
         self.cooldown_cycle.before_loop(self.cooldown_cycle_before)
         self.cooldown_cycle.after_loop(self.cooldown_cycle_after)
         if not self.cooldown_cycle.get_task():
@@ -26,7 +25,7 @@ class Cooldowns(commands.Cog):
         """
         Resets cooldowns every 24 hours
         """
-        print("IN COOLDOWN_CYCLE")
+        logger.info("Cooldown loop resetting cooldowns")
         await self.bot.clear_cooldowns()
 
     # @cooldown_cycle.before_loop
@@ -44,7 +43,6 @@ class Cooldowns(commands.Cog):
 
     # @cooldown_cycle.after_loop
     async def cooldown_cycle_after(self, _):
-        print("IN COOLDOWN_CYCLE_AFTER")
         if self.cooldown_cycle.failed():
             logger.critical(
                 "Cooldown cycle somehow errored out, restarting.", exc_info=True

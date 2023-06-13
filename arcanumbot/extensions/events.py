@@ -3,15 +3,15 @@
 import discord
 from discord.ext import commands
 
-from arcanumbot import ArcanumBot
+from arcanumbot import ArcanumBot, constants
 
 LARGE_RED_CIRCLE = "\N{LARGE RED CIRCLE}"
 LARGE_BLUE_DIAMOND = "\N{LARGE BLUE DIAMOND}"
 PURPLE_HEART = "\N{PURPLE HEART}"
 
-TARGET_MESSAGE = 651847553633222666
-ANNOUNCMENTS = 651673435704918046
-GIVEAWAYS = 519182542104952836
+TARGET_MESSAGE = constants.reaction_message
+ANNOUNCMENTS = constants.announcments_role
+GIVEAWAYS = constants.giveaways_role
 
 logger = logging.getLogger(__file__)
 
@@ -42,7 +42,6 @@ class Events(commands.Cog):
         ):
             return
 
-        await self.bot.refresh_guild()
         member = await self.bot.guild.fetch_member(payload.user_id)
 
         if member:
@@ -52,11 +51,16 @@ class Events(commands.Cog):
             msg = f"{payload.user_id} could not be converted to member."
             logger.critical(msg)
 
-            if self.bot.logging_channel:
-                await self.bot.logging_channel.send(msg)
+            await self.bot.logging_channel.send(msg)
 
     async def on_large_red_circle(self, member: discord.Member):
         announcments_role = self.bot.guild.get_role(ANNOUNCMENTS)
+
+        if announcments_role is None:
+            logger.critical(
+                f"Announcments role is missing: {member.id} was unable to get the announcment role"
+            )
+            return
 
         if announcments_role in member.roles:
             await member.remove_roles(announcments_role)
@@ -66,6 +70,12 @@ class Events(commands.Cog):
 
     async def on_large_blue_diamond(self, member: discord.Member):
         giveaways_role = self.bot.guild.get_role(GIVEAWAYS)
+
+        if giveaways_role is None:
+            logger.critical(
+                f"Giveaways role is missing: {member.id} was unable to get the giveaways role"
+            )
+            return
 
         if giveaways_role in member.roles:
             await member.remove_roles(giveaways_role)

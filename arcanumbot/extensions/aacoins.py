@@ -1,20 +1,21 @@
 import logging
 from random import choice
+from typing import Optional
 
 import discord
 from discord.ext import commands
 
 from arcanumbot import (
-    checks,
-    EmojiGameMenu,
     ArcanumBot,
-    MasterMindMenu,
-    Connect4,
-    db,
-    SubContext,
-    NormalPageSource,
-    MenuPages,
     ConfirmationMenu,
+    Connect4,
+    EmojiGameMenu,
+    MasterMindMenu,
+    MenuPages,
+    NormalPageSource,
+    SubContext,
+    checks,
+    db,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,18 +51,29 @@ class aacoins(commands.Cog):
         if member.guild != self.bot.guild:
             return
 
-        logger.info(f"{member} left guild.")
         coins = await self.bot.get_aacoin_amount(member.id)
 
         if coins:
-            await self.bot.prompt_delete(member.id)
+            logger.info(f"Dropping {member}({member.id}) from coins db; they had {coins} coins")
+
+            await self.bot.delete_user_aacoins(member.id)
+
+            await self.bot.logging_channel.send(
+                f"Dropped {member}({member.id}) from coins db; they had {coins} coins"
+            )
 
     @commands.group(name="coins", invoke_without_command=True)
-    async def view_aacoins(self, ctx: commands.Context, member: discord.Member = None):
+    async def view_aacoins(
+        self, ctx: commands.Context, member: Optional[discord.Member] = None
+    ):
         """
         View another member or your aacoin amount.
         """
-        member = member or ctx.author
+        if member is None:
+            # global command check prevents commands from being used in dms
+            assert isinstance(ctx.author, discord.Member)
+            member = ctx.author
+
         amount = await self.bot.get_aacoin_amount(member.id)
         plural = amount != 1
         await ctx.send(
@@ -77,8 +89,22 @@ class aacoins(commands.Cog):
 
         entries = []
         for user_id, coins in lb:
-            member = await self.bot.guild.fetch_member(user_id)
-            entries.append(f"{member}: {coins}")
+            assert ctx.guild is not None
+            # attempt cache pull first
+            if (member := ctx.guild.get_member(user_id)) is not None:
+                entries.append(f"{member}: {coins}")
+                continue
+
+            try:
+                member = str(await self.bot.guild.fetch_member(user_id))
+            except discord.NotFound:
+                logger.warning(f"Unbound user id {user_id} in coin db")
+                member = str(user_id)
+            except Exception as exc:
+                logger.critical(f"Unhandled exception in view all: {exc}")
+                member = str(user_id)
+            finally:
+                entries.append(f"{member}: {coins}")
 
         source = NormalPageSource(entries, per_page=10)
 
@@ -94,10 +120,8 @@ class aacoins(commands.Cog):
         """
         Add aacoins to a member.
         """
-        current = await self.bot.get_aacoin_amount(member.id)
-        await self.bot.set_aacoins(member.id, current + amount)
-        message = f"Added {amount} to {member}'s {ctx.bot.aacoin} balance."
-        await ctx.send(message)
+        await self.bot.add_aacoins(member.id, amount)
+        await ctx.send(f"Added {amount} to {member}'s {ctx.bot.aacoin} balance.")
 
     @commands.command(name="remove", aliases=["rem"])
     @checks.is_coin_mod_or_above()
@@ -107,35 +131,26 @@ class aacoins(commands.Cog):
         """
         Remove aacoins from a member.
         """
-        current = await self.bot.get_aacoin_amount(member.id)
-        await self.bot.set_aacoins(member.id, current - amount)
-        message = f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance."
-        await ctx.send(message)
+        await self.bot.remove_aacoins(member.id, amount)
+        await ctx.send(f"Removed {amount} from {member}'s {ctx.bot.aacoin} balance.")
 
-    @commands.command(name="clear_command")
+    @commands.command(name="clear")
     @checks.is_coin_mod_or_above()
     async def clear_aacoins(self, ctx: commands.Context, member: discord.Member):
         """
         Clear a member's aacoin(s).
         """
+        ammount = await self.bot.get_aacoin_amount(member.id)
         await self.bot.delete_user_aacoins(member.id)
-        message = f"Cleared {member}'s {ctx.bot.aacoin} balance"
-        await ctx.send(message)
+        await ctx.send(f"Cleared {member}'s {ctx.bot.aacoin} balance of {ammount}")
 
     @commands.command(name="cooldown-reset", aliases=["cr"])
     @checks.is_coin_mod_or_above()
     async def cooldown_reset(
-        self, ctx: SubContext, identifier: str, member: discord.Member
+        self, ctx: SubContext, member: discord.Member
     ):
-        async with db.get_database() as conn:
-            await conn.execute(
-                "DELETE FROM cooldowns WHERE command_name = (?) AND user_id = (?);",
-                (identifier, member.id),
-            )
-
-            await conn.commit()
-
-        await ctx.send("reset.")
+        await self.bot.clear_cooldowns_for_user(member.id)
+        await ctx.send(f"Reset cooldowns for {member}")
 
     @commands.command(name="react")
     @commands.max_concurrency(1, commands.BucketType.user)
@@ -160,7 +175,7 @@ class aacoins(commands.Cog):
             await ctx.send(f"{ctx.author.mention}, React timed out.")
 
     @aacoins_react_game.after_invoke
-    async def after_aacoins_mastermind_game(self, ctx: commands.Context):
+    async def after_aacoins_react_game(self, ctx: commands.Context):
         await ctx.bot.set_cooldown("React", ctx.author.id)
 
     @commands.command(name="mastermind")
@@ -210,6 +225,9 @@ class aacoins(commands.Cog):
         player1 = choice([ctx.author, member])
         player2 = member if player1 == ctx.author else ctx.author
 
+        assert isinstance(player1, discord.Member)
+        assert isinstance(player2, discord.Member)
+
         game = Connect4(player1, player2)
         winner = await game.run(ctx)
         if winner:
@@ -232,16 +250,11 @@ class aacoins(commands.Cog):
                     f"{winner.mention} has won and gained {CONNECT4_WIN}{ctx.bot.aacoin}s.\n"
                     f"{loser.mention} gained {CONNECT4_LOSE}{ctx.bot.aacoin}s for playing."
                 )
+            # TODO: figure out what needed to be fixed
             # Todo: Fix
             await ctx.bot.set_cooldown("Connect4", ctx.author.id)
         else:
             await ctx.send("No one made a move.")
-
-    # @commands.command(name="typeracer")
-    # async def aacoins_typeracer(self, ctx: SubContext):
-    #     """help string"""
-    #     game = TypeRacer(self.bot, ctx)
-    #     await ctx.send(await game.run())
 
 
 async def setup(bot: ArcanumBot):
