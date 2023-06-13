@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "arcanumbot"
-version = "2.0.0"
+version = "2.1.0"
 description = "Discord bot for the arcanum"
 authors = ["StarrFox <starrfox6312@gmail.com>"]
 license = "MIT"
