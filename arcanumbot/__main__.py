@@ -1,10 +1,7 @@
 import asyncio
 import logging
-from configparser import ConfigParser
-from pathlib import Path
 
 from arcanumbot import ArcanumBot, db
-
 
 DBSCHEMA = """
 CREATE TABLE IF NOT EXISTS "coins" (
@@ -54,6 +51,7 @@ async def _main():
 
     await bot.load_extension("jishaku")
 
+    # TODO: read token from file
     await bot.start()
 
 

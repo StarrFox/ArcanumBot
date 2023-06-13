@@ -1,13 +1,11 @@
 import logging
 import pathlib
-from asyncio import CancelledError, create_task
-from contextlib import suppress
 from typing import Union
 
 import discord
 from discord.ext import commands
 
-from . import ConfirmDeleteMenu, MockContext, SubContext, db, constants
+from . import SubContext, constants, db
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +31,27 @@ class ArcanumBot(commands.Bot):
             **kwargs,
         )
         self.ready_once = False
-        self.guild = None
         self.prompt_tasks = []
-        self.logging_channel = None
         self.add_check(self.only_one_guild)
+
+    @property
+    def guild(self):
+        guild = self.get_guild(constants.guild_id)
+        if guild is None:
+            raise RuntimeError(f"Target guild could not be found")
+
+        return guild
+
+    @property
+    def logging_channel(self):
+        logging_channel = self.guild.get_channel(constants.logging_channel_id)
+        if logging_channel is None:
+            raise RuntimeError(f"Target logging channel could not be found")
+
+        if not isinstance(logging_channel, discord.TextChannel):
+            raise RuntimeError(f"Taget logging channel is not of type TextChannel")
+
+        return logging_channel
 
     async def process_commands(self, message):
         if message.author.bot:
@@ -52,13 +67,7 @@ class ArcanumBot(commands.Bot):
 
         self.ready_once = True
 
-        self.guild = self.get_guild(constants.guild_id)
-        if self.guild:
-            self.logging_channel = self.guild.get_channel(
-                constants.logging_channel_id
-            )
-
-            await self.validate_coins()
+        await self.validate_coins()
 
         res = await self.load_extensions_from_dir("arcanumbot/extensions")
 
@@ -104,46 +113,31 @@ class ArcanumBot(commands.Bot):
         if not ctx.guild:
             raise commands.NoPrivateMessage(f"Please use commands in {self.guild}.")
 
+        if ctx.guild != self.guild:
+            raise commands.CheckFailure(f"Please use commands in {self.guild}.")
+
         return True
 
-    async def refresh_guild(self):
-        self.guild = self.get_guild(self.guild.id)
-        return self.guild
-
     async def validate_coins(self):
+        """Resyncs coin db with discord api status"""
         async with db.get_database() as connection:
             cursor = await connection.execute("SELECT * FROM coins;")
             for user_id, amount in await cursor.fetchall():
                 try:
                     member = await self.guild.fetch_member(user_id)
                 except discord.NotFound:
-                    logger.info(f"Deleted account {user_id} found in coin db")
-                    self.prompt_tasks.append(create_task(self.prompt_delete(user_id)))
+                    await self.delete_user_aacoins(user_id)
+                    logger.info(
+                        f"Dropped [deleted] account {user_id} from coin db; had {amount} coins"
+                    )
                     continue
 
-                if member is not None:
-                    pass
-                else:
-                    logger.info(f"left account {user_id} found in coin db")
-                    self.prompt_tasks.append(create_task(self.prompt_delete(user_id)))
-
-    async def prompt_delete(self, user_id):
-        with suppress(CancelledError):
-            ctx = MockContext(
-                bot=self,
-                author=self.get_user(285148358815776768),
-                guild=self.guild,
-                channel=self.logging_channel,
-            )
-
-            menu = ConfirmDeleteMenu(user_id)
-
-            response = await menu.get_response(ctx)
-            if response is True:
-                await self.delete_user_aacoins(user_id)
-
-            else:
-                pass
+                # None means the member has left
+                if member is None:
+                    await self.delete_user_aacoins(user_id)
+                    logger.info(
+                        f"Dropped [left] account {user_id} from coin db; had {amount} coins"
+                    )
 
     @staticmethod
     async def delete_user_aacoins(user_id):
@@ -157,7 +151,7 @@ class ArcanumBot(commands.Bot):
         logger.info(f"Deleted coin account {user_id}.")
 
     @staticmethod
-    async def get_aacoin_amount(user_id):
+    async def get_aacoin_amount(user_id) -> int:
         async with db.get_database() as connection:
             cursor = await connection.execute(
                 "SELECT coins FROM coins WHERE user_id = (?);", (user_id,)

@@ -24,7 +24,9 @@ async def on_command_error(ctx: commands.Context, error):
     elif isinstance(error, commands.CommandError) and not isinstance(
         error, commands.CommandOnCooldown
     ):
-        ctx.command.reset_cooldown(ctx)
+        if ctx.command is not None:
+            ctx.command.reset_cooldown(ctx)
+
         return await ctx.send(str(error))
 
     elif isinstance(error, commands.CommandOnCooldown):
@@ -32,9 +34,10 @@ async def on_command_error(ctx: commands.Context, error):
         natural = naturaldelta(delta)
         return await ctx.send(f"Command on cooldown, retry in {natural}.")
 
-    logger.error(
-        f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
-    )
+    if ctx.command is not None:
+        logger.error(
+            f"Unhandled error in command {ctx.command.name}\nInvoke message: {ctx.message.content}\n{error=}"
+        )
 
     await ctx.send(f"Unknown error while executing {ctx.command}, will be fixed soon.")
 

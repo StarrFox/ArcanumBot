@@ -1,52 +1,7 @@
-﻿from dataclasses import dataclass
-from typing import Sequence
+﻿from typing import Sequence, Optional
 
 import discord
 from discord.ext import commands, menus
-
-
-# This is super bad but /shrug
-@dataclass()
-class MockContext:
-    bot: commands.Bot
-    author: discord.User
-    guild: discord.Guild
-    channel: discord.TextChannel
-
-
-class ConfirmDeleteMenu(menus.Menu):
-    def __init__(self, user_id, **kwargs):
-        super().__init__(timeout=kwargs.pop("timeout", None), **kwargs)
-        self.user_id = user_id
-        self.response = None
-
-    async def send_initial_message(self, ctx, channel):
-        starrfox = await ctx.bot.guild.fetch_member(285148358815776768)
-
-        try:
-            user = await self.bot.fetch_user(self.user_id)
-        except discord.NotFound:
-            user = "[Deleted]"
-
-        return await ctx.bot.logging_channel.send(
-            f"{starrfox.mention} Userid {self.user_id} was not found in guild.\n"
-            f"id resolves to {user}\n"
-            f"discard?"
-        )
-
-    @menus.button("\N{WHITE HEAVY CHECK MARK}")
-    async def do_yes(self, _):
-        self.response = True
-        self.stop()
-
-    @menus.button("\N{CROSS MARK}")
-    async def do_no(self, _):
-        self.response = False
-        self.stop()
-
-    async def get_response(self, ctx):
-        await self.start(ctx, wait=True)
-        return self.response
 
 
 class MenuPages(menus.MenuPages):
@@ -98,6 +53,7 @@ class MenuPages(menus.MenuPages):
     @menus.button("\N{BLACK SQUARE FOR STOP}\ufe0f", skip_if=skip_only_one_page)
     async def stop_pages(self, payload):
         """stops the pagination session."""
+        assert self.message is not None
         await self.message.delete()
         self.stop()
 
@@ -116,9 +72,9 @@ class NormalPageSource(menus.ListPageSource):
 class ConfirmationMenu(menus.Menu):
     def __init__(
         self,
-        to_confirm: str = None,
+        to_confirm: Optional[str] = None,
         *,
-        owner_id: int = None,
+        owner_id: Optional[int] = None,
         send_kwargs=None,
         **kwargs,
     ):
@@ -136,20 +92,6 @@ class ConfirmationMenu(menus.Menu):
         self, ctx: commands.Context, channel: discord.TextChannel
     ):
         return await ctx.send(self.to_confirm or "\u200b", **self.send_kwargs)
-
-    def reaction_check(self, payload):
-        if payload.message_id != self.message.id:
-            return False
-
-        if self.owner_id is not None:
-            if payload.user_id not in (self.owner_id, self.bot.owner_id):
-                return False
-
-        else:
-            if payload.user_id not in (self.bot.owner_id, self._author_id):
-                return False
-
-        return payload.emoji in self.buttons
 
     @menus.button("\N{WHITE HEAVY CHECK MARK}")
     async def do_yes(self, _):

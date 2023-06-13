@@ -75,7 +75,7 @@ class MasterMindMenu(menus.Menu):
     async def send_initial_message(self, ctx, channel):
         return await ctx.send(
             f"Guess the code to win {ctx.bot.aacoin}s!"
-            f"\nYou start with 1000 and every guess removes 100."
+            f"\nYou start with 500 and every guess removes 50."
             f"\n{YELLOW_CIRCLE} means the emoji is used in the code but in a different position."
             f"\n{GREEN_CIRCLE} means the emoji is correct and in the correct position."
             f"\n**Circles are not ordered.**"
@@ -97,6 +97,10 @@ class MasterMindMenu(menus.Menu):
         return "\n".join(res)
 
     async def do_entry_button(self, payload):
+        # .send has been called by now
+        assert self.ctx is not None
+        assert self.message is not None
+
         if self.position == 5:
             return await self.ctx.send(
                 f"{self.ctx.author.mention}, Max entry reached.", delete_after=5
@@ -118,10 +122,14 @@ class MasterMindMenu(menus.Menu):
 
         self.position -= 1
         self.entry[self.position] = "X"
+        assert self.message is not None
         await self.message.edit(content=self.console)
 
     @menus.button(RETURN_ARROW, position=menus.Last(1))
     async def do_enter(self, _):
+        assert self.ctx is not None
+        assert self.message is not None
+
         if self.position != 5:
             return await self.ctx.send(
                 f"{self.ctx.author.mention}, Entry not full.", delete_after=5
@@ -235,6 +243,7 @@ class Connect4(menus.Menu):
     @menus.button("\N{BLACK DOWN-POINTING DOUBLE TRIANGLE}", position=menus.Last())
     async def do_resend(self, _):
         await self.message.delete()
+        assert self.ctx is not None
         self.message = msg = await self.send_initial_message(self.ctx, self.ctx.channel)
         for emoji in self.buttons:
             await msg.add_reaction(emoji)
@@ -317,58 +326,12 @@ class Connect4(menus.Menu):
             if check(diagonal):
                 return True
 
-    async def run(self, ctx) -> Optional[Union[discord.Member, Tuple[discord.Member]]]:
+    async def run(
+        self, ctx
+    ) -> Optional[Union[discord.Member, Tuple[discord.Member, discord.Member]]]:
         """
         Run the game and return the winner(s)
         returns None if the first player never made a move
         """
         await self.start(ctx, wait=True)
         return self.winner
-
-
-# class TypeRacer:
-#     def __init__(self, bot, ctx):
-#         self.target_sentence = self.get_words()
-#         self.bot = bot
-#         self.ctx = ctx
-#         self.start = None
-#
-#     @staticmethod
-#     def get_words():
-#         letters = "abcdef"
-#         return letters
-#
-#     async def wait_for_reply(self):
-#         def _message_check(msg):
-#             return all([msg.author == self.ctx.author, msg.channel == self.ctx.channel])
-#         try:
-#             message = await self.bot.wait_for("message", check=_message_check)
-#         except asyncio.TimeoutError:
-#             return "message timeout"
-#
-#         if message.content == self.target_sentence:
-#             time_diff = message.created_at - self.start
-#             adjusted = time_diff - datetime.timedelta(seconds=self.bot.latency)
-#             return f"won\n" \
-#                    f"message made at={message.created_at}\n" \
-#                    f"internal start={self.start}\n" \
-#                    f"time diff={time_diff} ({utils.detailed_human_time(time_diff.total_seconds())})\n" \
-#                    f"bot latency={self.bot.latency}S\n" \
-#                    f"adjusted time={adjusted} ({utils.detailed_human_time(adjusted.total_seconds())})"
-#
-#         else:
-#             return "wrong message"
-#
-#     async def run(self):
-#         await self.ctx.send(f'plz type "{self.target_sentence}" real quick')
-#
-#         def _typing_check(chl, usr, _):
-#             return all([chl == self.ctx.channel, usr == self.ctx.author])
-#
-#         try:
-#             channel, user, when = await self.bot.wait_for("typing", check=_typing_check)
-#         except asyncio.TimeoutError:
-#             return "typing timeout"
-#
-#         self.start = when
-#         return await self.wait_for_reply()

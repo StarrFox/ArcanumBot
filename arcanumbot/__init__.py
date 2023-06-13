@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from . import checks, db, utils, constants
+from . import checks, constants, db, utils
 from .bot import *
 from .context import SubContext
 from .games import *

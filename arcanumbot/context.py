@@ -5,7 +5,9 @@ from discord.ext.commands import Context
 
 
 class SubContext(Context):
-    async def confirm(self, message: str = "\N{WHITE HEAVY CHECK MARK}") -> Optional[Message]:
+    async def confirm(
+        self, message: str = "\N{WHITE HEAVY CHECK MARK}"
+    ) -> Optional[Message]:
         """
         Adds a checkmark to ctx.message.
         If unable to, sends <message>

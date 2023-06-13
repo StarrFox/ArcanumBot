@@ -332,14 +332,14 @@ resolved_reference = "8686b5d1bbc1d3c862292eb436ab630d6e9c9b53"
 
 [[package]]
 name = "discord-py"
-version = "2.2.3"
+version = "2.3.0"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "discord.py-2.2.3-py3-none-any.whl", hash = "sha256:792bdcfe71cfe013c446cf379b2e83e08b5050604322ad6fb592864e63511abd"},
-    {file = "discord.py-2.2.3.tar.gz", hash = "sha256:f9df95795c6f52c5db43b7ab43634993e12ef233288636a759166dd9c134d077"},
+    {file = "discord.py-2.3.0-py3-none-any.whl", hash = "sha256:3e9498967822ad4499f8f72deb9173f942d9827d92b6e4e4e7732d24f78f300c"},
+    {file = "discord.py-2.3.0.tar.gz", hash = "sha256:c71066a30f037d069218e59092505c3e8945fd175e396a80748056d989756806"},
 ]
 
 [package.dependencies]
@@ -781,21 +781,6 @@ files = [
 ]
 
 [[package]]
-name = "reusables"
-version = "0.9.6"
-description = "Commonly Consumed Code Commodities"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "reusables-0.9.6-py3-none-any.whl", hash = "sha256:a1b8fb50ccf8da61f8ccec326d3a559fa8e12702aefa53e7d23d0742b5227963"},
-    {file = "reusables-0.9.6.tar.gz", hash = "sha256:d80e542d080fec741478851498cc7e5f7c624d4ee14d73a8fd4c48c2c6c21355"},
-]
-
-[package.extras]
-testing = ["argparse", "coverage (>=3.6)", "pytest", "pytest-cov", "rarfile", "scandir", "tox"]
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -913,4 +898,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "62845275c8477529f207917da7addd2dfaf9e07b786f89a75b9a69f90ab5ac55"
+content-hash = "8509a9b3792ad0704b2c243c9850dbd9231a7ad02b294a1afa8a7333f19dee0c"

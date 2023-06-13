@@ -1,5 +1,6 @@
 import logging
 from random import choice
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -50,18 +51,29 @@ class aacoins(commands.Cog):
         if member.guild != self.bot.guild:
             return
 
-        logger.info(f"{member} left guild.")
         coins = await self.bot.get_aacoin_amount(member.id)
 
         if coins:
-            await self.bot.prompt_delete(member.id)
+            logger.info(f"Dropping {member} from coins db; they had {coins} coins")
+
+            await self.bot.delete_user_aacoins(member.id)
+
+            await self.bot.logging_channel.send(
+                "Dropped {member}({member.id}) from coins db; they had {coins} coins"
+            )
 
     @commands.group(name="coins", invoke_without_command=True)
-    async def view_aacoins(self, ctx: commands.Context, member: discord.Member = None):
+    async def view_aacoins(
+        self, ctx: commands.Context, member: Optional[discord.Member] = None
+    ):
         """
         View another member or your aacoin amount.
         """
-        member = member or ctx.author
+        if member is None:
+            # global command check prevents commands from being used in dms
+            assert isinstance(ctx.author, discord.Member)
+            member = ctx.author
+
         amount = await self.bot.get_aacoin_amount(member.id)
         plural = amount != 1
         await ctx.send(
@@ -77,11 +89,22 @@ class aacoins(commands.Cog):
 
         entries = []
         for user_id, coins in lb:
+            assert ctx.guild is not None
             # attempt cache pull first
-            if (member := ctx.guild.get_member(user_id)) is None:
-                member = await self.bot.guild.fetch_member(user_id)
+            if (member := ctx.guild.get_channel(user_id)) is not None:
+                entries.append(f"{member}: {coins}")
+                continue
 
-            entries.append(f"{member}: {coins}")
+            try:
+                member = str(await self.bot.guild.fetch_member(user_id))
+            except discord.NotFound:
+                logger.warning(f"Unbound user id {user_id} in coin db")
+                member = str(user_id)
+            except Exception as exc:
+                logger.critical(f"Unhandled exception in view all: {exc}")
+                member = str(user_id)
+            finally:
+                entries.append(f"{member}: {coins}")
 
         source = NormalPageSource(entries, per_page=10)
 
@@ -213,6 +236,9 @@ class aacoins(commands.Cog):
         player1 = choice([ctx.author, member])
         player2 = member if player1 == ctx.author else ctx.author
 
+        assert isinstance(player1, discord.Member)
+        assert isinstance(player2, discord.Member)
+
         game = Connect4(player1, player2)
         winner = await game.run(ctx)
         if winner:
@@ -235,16 +261,11 @@ class aacoins(commands.Cog):
                     f"{winner.mention} has won and gained {CONNECT4_WIN}{ctx.bot.aacoin}s.\n"
                     f"{loser.mention} gained {CONNECT4_LOSE}{ctx.bot.aacoin}s for playing."
                 )
+            # TODO: figure out what needed to be fixed
             # Todo: Fix
             await ctx.bot.set_cooldown("Connect4", ctx.author.id)
         else:
             await ctx.send("No one made a move.")
-
-    # @commands.command(name="typeracer")
-    # async def aacoins_typeracer(self, ctx: SubContext):
-    #     """help string"""
-    #     game = TypeRacer(self.bot, ctx)
-    #     await ctx.send(await game.run())
 
 
 async def setup(bot: ArcanumBot):
