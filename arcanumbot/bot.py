@@ -32,6 +32,7 @@ class ArcanumBot(commands.Bot):
         )
         self.ready_once = False
         self.add_check(self.only_one_guild)
+        self.database = db.Database()
 
     @property
     def guild(self):
@@ -128,140 +129,40 @@ class ArcanumBot(commands.Bot):
         return True
 
     async def validate_coins(self):
-        """Resyncs coin db with discord api status"""
-        async with (await db.get_database())  as connection:
-            cursor = await connection.execute("SELECT * FROM coins;")
-            for user_id, amount in await cursor.fetchall():
-                try:
-                    member = await self.guild.fetch_member(user_id)
-                except discord.NotFound:
-                    await self.delete_user_aacoins(user_id)
-                    logger.info(
-                        f"Dropped [deleted] account {user_id} from coin db; had {amount} coins"
-                    )
-                    await self.logging_channel.send(f"Dropped [deleted] account {user_id} from coin db; had {amount} coins")
-                    continue
+        return await self.database.sync_coins_to_discord(self)
 
-                # None means the member has left
-                if member is None:
-                    await self.delete_user_aacoins(user_id)
-                    logger.info(
-                        f"Dropped [left] account {user_id} from coin db; had {amount} coins"
-                    )
-                    await self.logging_channel.send(f"Dropped [left] account {user_id} from coin db; had {amount} coins")
+    async def delete_user_aacoins(self, user_id):
+        return await self.database.delete_coin_account(user_id)
 
-    @staticmethod
-    async def delete_user_aacoins(user_id):
-        async with (await db.get_database())  as connection:
-            await connection.execute(
-                "DELETE FROM coins WHERE user_id = (?);", (user_id,)
-            )
+    async def get_aacoin_amount(self, user_id) -> int:
+        return await self.database.get_coin_balance(user_id)
 
-            await connection.commit()
-
-        logger.info(f"Deleted coin account {user_id}.")
-
-    @staticmethod
-    async def get_aacoin_amount(user_id) -> int:
-        async with (await db.get_database())  as connection:
-            cursor = await connection.execute(
-                "SELECT coins FROM coins WHERE user_id = (?);", (user_id,)
-            )
-
-            res = await cursor.fetchone()
-
-            if res:
-                return res[0]
-            else:
-                return 0
-
-    @staticmethod
-    async def get_aacoin_lb():
-        async with (await db.get_database()) as connection:
-            cursor = await connection.execute(
-                "SELECT user_id, coins FROM coins ORDER BY coins DESC;"
-            )
-
-            return await cursor.fetchall()
+    async def get_aacoin_lb(self):
+        return await self.database.get_all_coin_balances()
 
     async def add_aacoins(self, user_id: int, amount: int) -> int:
-        balance = await self.get_aacoin_amount(user_id)
-        balance += amount
-        await self.set_aacoins(user_id, balance)
-        return balance
+        return await self.database.add_coins(user_id, amount)
 
     async def remove_aacoins(self, user_id: int, amount: int) -> int:
-        balance = await self.get_aacoin_amount(user_id)
-        balance -= amount
-        await self.set_aacoins(user_id, balance)
-        return balance
+        return await self.database.remove_coins(user_id, amount)
 
-    @staticmethod
-    async def set_aacoins(user_id, amount):
-        async with (await db.get_database())  as connection:
-            await connection.execute(
-                "INSERT OR REPLACE INTO coins (user_id, coins) VALUES (?, ?);",
-                (user_id, amount),
-            )
+    async def set_aacoins(self, user_id: int, amount: int):
+        return await self.database.set_coins(user_id, amount)
 
-            await connection.commit()
+    async def set_cooldown(self, command_name, user_id):
+        return await self.database.set_cooldown(user_id, command_name)
 
-        logger.info(f"Set coin account {user_id} to {amount}.")
+    async def clear_cooldowns(self):
+        return await self.database.clear_all_cooldowns()
 
-    @staticmethod
-    async def set_cooldown(command_name, user_id):
-        async with (await db.get_database())  as connection:
-            await connection.execute(
-                "INSERT INTO cooldowns (command_name, user_id) VALUES (?, ?);",
-                (command_name, user_id),
-            )
+    async def clear_cooldowns_for_user(self, user_id: int):
+        return await self.database.clear_cooldowns_for_user(user_id)
 
-            await connection.commit()
+    async def is_on_cooldown(self, command_name: str, user_id: int) -> bool:
+        return await self.database.is_on_cooldown(command_name, user_id)
 
-        logger.info(f"Set cooldown for {user_id} for command {command_name}")
+    async def set_purple_heart(self, user_id: int):
+        return await self.database.set_purple_heart(user_id)
 
-    @staticmethod
-    async def clear_cooldowns():
-        async with (await db.get_database())  as connection:
-            await connection.execute("DELETE FROM cooldowns;")
-            await connection.commit()
-
-        logger.info("Reset cooldowns")
-
-    @staticmethod
-    async def clear_cooldowns_for_user(user_id: int):
-        async with (await db.get_database()) as connection:
-            await connection.execute("DELETE FROM cooldowns WHERE user_id = (?);", (user_id,))
-            await connection.commit()
-
-        logger.info(f"Reset cooldowns for {user_id}")
-
-    @staticmethod
-    async def is_on_cooldown(command_name, user_id) -> bool:
-        async with (await db.get_database()) as connection:
-            cursor = await connection.execute(
-                "SELECT * FROM cooldowns WHERE command_name = (?) AND user_id = (?);",
-                (command_name, user_id),
-            )
-
-            return bool(await cursor.fetchone())
-
-    @staticmethod
-    async def set_purple_heart(user_id):
-        async with (await db.get_database())  as connection:
-            await connection.execute(
-                "INSERT INTO purple_hearts (user_id) VALUES (?);", (user_id,)
-            )
-
-            await connection.commit()
-
-        logger.info(f"Set purple heart for {user_id}")
-
-    @staticmethod
-    async def is_purple_heart(user_id) -> bool:
-        async with (await db.get_database()) as connection:
-            cursor = await connection.execute(
-                "SELECT * FROM purple_hearts WHERE user_id = (?);", (user_id,)
-            )
-
-            return bool(await cursor.fetchone())
+    async def is_purple_heart(self, user_id) -> bool:
+        return await self.database.is_purple_heart(user_id)

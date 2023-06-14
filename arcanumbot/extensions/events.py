@@ -13,7 +13,7 @@ TARGET_MESSAGE = constants.reaction_message
 ANNOUNCMENTS = constants.announcments_role
 GIVEAWAYS = constants.giveaways_role
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class Events(commands.Cog):

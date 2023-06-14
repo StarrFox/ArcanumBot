@@ -6,7 +6,7 @@ from discord.ext import commands, tasks
 
 from arcanumbot import ArcanumBot
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 class Cooldowns(commands.Cog):
