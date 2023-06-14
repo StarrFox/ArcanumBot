@@ -7,7 +7,7 @@
 with lib; let
   cfg = config.services.arcanumbot;
   defaultUser = "arcnaumbot";
-  selfpkgs = selfpkgs.${pkgs.system};
+  spkgs = selfpkgs.${pkgs.system};
 in {
   # used for debugging (show filename)
   _file = "arcanumbot.nix";
@@ -50,7 +50,7 @@ in {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
-        ExecStart = "${selfpkgs.default}/bin/arcanumbot --secret ${cfg.tokenFile}";
+        ExecStart = "${spkgs.default}/bin/arcanumbot --secret ${cfg.tokenFile}";
       };
     };
 
