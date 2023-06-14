@@ -6,7 +6,7 @@
 }:
 with lib; let
   cfg = config.services.arcanumbot;
-  defaultUser = "arcnaumbot";
+  defaultUser = "arcanumbot";
   spkgs = selfpkgs.${pkgs.system};
 in {
   # used for debugging (show filename)
