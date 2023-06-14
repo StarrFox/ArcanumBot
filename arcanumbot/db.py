@@ -128,7 +128,6 @@ class Database:
             if row is not None:
                 return row["coins"]
 
-            # TODO: test for non-existing accounts
             return 0
 
     async def get_all_coin_balances(self) -> list[CoinsEntry]:

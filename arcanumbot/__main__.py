@@ -21,7 +21,6 @@ os.environ["JISHAKU_NO_UNDERSCORE"] = "true"
 os.environ["JISHAKU_RETAIN"] = "true"
 
 
-# TODO: create_tables is not called
 @click.command()
 @click.option(
     "--secret",
