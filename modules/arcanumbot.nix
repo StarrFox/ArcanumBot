@@ -32,6 +32,13 @@ in {
         creates a new group named arcanumbot by default
       '';
     };
+    tokenFile = mkOption {
+      type = types.path;
+      example = literalExpression "~/discord_token";
+      description = lib.mdDoc ''
+        file with discord token to be used by the bot
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -43,7 +50,7 @@ in {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
-        ExecStart = "${selfpkgs.default}/bin/arcanumbot";
+        ExecStart = "${selfpkgs.default}/bin/arcanumbot --secret ${cfg.tokenFile}";
       };
     };
 
