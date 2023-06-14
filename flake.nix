@@ -30,6 +30,12 @@
               buildInputs = (old.buildInputs or []) ++ [super.setuptools];
             }
           );
+          jishaku = super.jishaku.overridePythonAttrs (
+            old: {
+              buildInputs = (old.buildInputs or []) ++ [super.setuptools];
+              propagatedBuildInputs = (old.propagatedBuildInputs or []) ++ [super.setuptools];
+            }
+          );
         };
       in {
         packages.default = pkgs.poetry2nix.mkPoetryApplication {

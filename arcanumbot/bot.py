@@ -9,6 +9,8 @@ from . import SubContext, constants, db
 
 logger = logging.getLogger(__name__)
 
+ROOT = pathlib.Path(__file__).parent
+
 
 class ArcanumBot(commands.Bot):
     aacoin = constants.aacoin_emoji
@@ -76,13 +78,11 @@ class ArcanumBot(commands.Bot):
         self.ready_once = True
 
         await self.validate_coins()
-
         await self.load_extension("jishaku")
 
-        res = await self.load_extensions_from_dir("arcanumbot/extensions")
-
-        if not res:
-            await self.load_extensions_from_dir("extensions")
+        root = pathlib.Path(__file__).parent
+        extensions_path = root / "extensions"
+        await self.load_extensions_from_dir(extensions_path)
 
         logger.info(f"Bot ready with {len(self.extensions.keys())} extensions.")
 
@@ -105,6 +105,8 @@ class ArcanumBot(commands.Bot):
         extension_names = []
 
         for subpath in path.glob("**/[!_]*.py"):  # Ignore if starts with _
+            subpath = subpath.relative_to(ROOT)
+
             parts = subpath.with_suffix("").parts
             if parts[0] == ".":
                 parts = parts[1:]
@@ -113,7 +115,7 @@ class ArcanumBot(commands.Bot):
 
         for ext in extension_names:
             try:
-                await self.load_extension(ext)
+                await self.load_extension("arcanumbot." + ext)
             except (commands.errors.ExtensionError, commands.errors.ExtensionFailed):
                 logger.exception("Failed loading " + ext)
 
