@@ -2,8 +2,15 @@
 default:
     just --list
 
-# format python and nix
+# update deps
+update:
+    nix flake update
+    # the poetry devs dont allow this with normal update for some unknown reason
+    poetry up --latest
+
+# format
 format:
-    isort . --skip-gitignore
+    # TODO: treefmt?
+    isort .
     black .
     alejandra .

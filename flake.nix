@@ -49,7 +49,7 @@
 
         devShells.default = pkgs.mkShell {
           name = "arcanumbot";
-          packages = with pkgs; [poetry just alejandra black isort];
+          packages = with pkgs; [(poetry.withPlugins (ps: with ps; [poetry-plugin-up])) just alejandra black isort];
         };
       };
       flake = {
