@@ -41,6 +41,7 @@
         packages.default = pkgs.poetry2nix.mkPoetryApplication {
           projectDir = ./.;
           preferWheels = true;
+          python = pkgs.python311;
           overrides = [
             pkgs.poetry2nix.defaultPoetryOverrides
             overrides
@@ -49,7 +50,7 @@
 
         devShells.default = pkgs.mkShell {
           name = "arcanumbot";
-          packages = with pkgs; [(poetry.withPlugins (ps: with ps; [poetry-plugin-up])) just alejandra black isort];
+          packages = with pkgs; [(poetry.withPlugins (ps: with ps; [poetry-plugin-up])) python311 just alejandra black isort];
         };
       };
       flake = {

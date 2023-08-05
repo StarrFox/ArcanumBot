@@ -6,7 +6,7 @@ authors = ["StarrFox <starrfox6312@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 jishaku = "^2.5.1"
 pendulum = "^2.1.2"
 numpy = "^1.25.2"
