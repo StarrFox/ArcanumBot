@@ -11,10 +11,10 @@ jishaku = "^2.5.1"
 pendulum = "^2.1.2"
 numpy = "^1.25.2"
 discord-ext-menus = {git = "https://github.com/Rapptz/discord-ext-menus"}
-humanize = "^4.7.0"
-"discord.py" = "^2.3.1"
+humanize = "^4.8.0"
+"discord.py" = "^2.3.2"
 psutil = "^5.9.5"
-click = "^8.1.6"
+click = "^8.1.7"
 uvloop = {version = "^0.17.0", markers = "platform_system == 'Linux'"}
 asyncpg = "^0.28.0"
 
