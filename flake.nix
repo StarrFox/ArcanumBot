@@ -2,7 +2,7 @@
   description = "arcanumbot";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts/";
     nix-systems.url = "github:nix-systems/default";
   };
@@ -24,6 +24,8 @@
         system,
         ...
       }: let
+        python = pkgs.python311;
+
         overrides = self: super: {
           discord-ext-menus = super.discord-ext-menus.overridePythonAttrs (
             old: {
@@ -38,26 +40,37 @@
           );
         };
       in {
-        packages.default = pkgs.poetry2nix.mkPoetryApplication {
+        packages.arcanumbot = pkgs.poetry2nix.mkPoetryApplication {
           projectDir = ./.;
           preferWheels = true;
-          python = pkgs.python311;
+          python = python;
           overrides = [
             pkgs.poetry2nix.defaultPoetryOverrides
             overrides
           ];
         };
 
+        packages.default = self'.packages.arcanumbot;
+
         devShells.default = pkgs.mkShell {
           name = "arcanumbot";
-          packages = with pkgs; [(poetry.withPlugins (ps: with ps; [poetry-plugin-up])) python311 just alejandra black isort];
+          packages = with pkgs; [
+            (poetry.withPlugins (ps: with ps; [poetry-plugin-up]))
+            python
+            just
+            alejandra
+            python.pkgs.black
+            python.pkgs.isort
+          ];
         };
       };
       flake = {
-        nixosModules.default = import ./modules/arcanumbot.nix {
+        nixosModules.arcanumbot = import ./modules/arcanumbot.nix {
           # packages.system is taken from pkgs.system
           selfpkgs = self.packages;
         };
+
+        nixosModules.default = self.nixosModules.arcanumbot;
       };
     };
 }
