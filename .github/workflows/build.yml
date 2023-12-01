@@ -1,7 +1,18 @@
 name: "build"
 on:
     pull_request:
+        paths:
+            - "arcanumbot/**"
+            - "flake.*"
+            - ".github/workflows/build.yml"
+            - "pyproject.toml"
     push:
+        branches: ["main"]
+        paths:
+            - "arcanumbot/**"
+            - "flake.*"
+            - ".github/workflows/build.yml"
+            - "pyproject.toml"
 
 jobs:
     build:
