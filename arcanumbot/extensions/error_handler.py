@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
-import discord
 
+import discord
 from discord.ext import commands
 from humanize import naturaldelta
 
@@ -27,14 +27,11 @@ async def on_command_error(ctx: commands.Context[ArcanumBot], error):
         return await ctx.send("You don't have permission to run that command")
 
     # Reset cooldown when command doesn't finish
-    elif not isinstance(
-        error, commands.CommandOnCooldown
-    ):
+    elif not isinstance(error, commands.CommandOnCooldown):
         if ctx.command is not None:
             ctx.command.reset_cooldown(ctx)
 
             cooldowns_reset = True
-
 
     elif isinstance(error, commands.CommandOnCooldown):
         delta = timedelta(seconds=error.retry_after)
@@ -53,7 +50,7 @@ async def on_command_error(ctx: commands.Context[ArcanumBot], error):
 
     await ctx.send(
         f"{owner_mention}Unknown error while executing {ctx.command}{cooldown_message}",
-        allowed_mentions=discord.AllowedMentions(users=True)
+        allowed_mentions=discord.AllowedMentions(users=True),
     )
 
 
