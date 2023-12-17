@@ -26,6 +26,9 @@ update-commit: update && create-tag
     git commit -am "bump deps"
     git push
 
+run:
+    nix run
+
 # format
 format:
     # TODO: treefmt?
