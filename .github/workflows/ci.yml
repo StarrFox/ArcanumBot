@@ -1,0 +1,29 @@
+name: "ci"
+on:
+  pull_request:
+      paths:
+          - "arcanumbot/**"
+          - "flake.*"
+          - ".github/workflows/ci.yml"
+          - "pyproject.toml"
+  push:
+      branches: ["main"]
+      paths:
+          - "arcanumbot/**"
+          - "flake.*"
+          - ".github/workflows/ci.yml"
+          - "pyproject.toml"
+
+jobs:
+    ci:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: cachix/cachix-action@v13
+        with:
+          name: starrfox
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: check flake
+        run: nix flake check
+      - run: nix build
