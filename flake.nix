@@ -5,12 +5,17 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts/";
     nix-systems.url = "github:nix-systems/default";
+    poetry2nix = {
+      url = "github:nix-community/poetry2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
     self,
     flake-parts,
     nix-systems,
+    poetry2nix,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -26,6 +31,8 @@
       }: let
         python = pkgs.python311;
 
+        poetry2nix' = poetry2nix.lib.mkPoetry2Nix {inherit pkgs;};
+
         overrides = self: super: {
           discord-ext-menus = super.discord-ext-menus.overridePythonAttrs (
             old: {
@@ -40,12 +47,12 @@
           );
         };
       in {
-        packages.arcanumbot = pkgs.poetry2nix.mkPoetryApplication {
+        packages.arcanumbot = poetry2nix'.mkPoetryApplication {
           projectDir = ./.;
           preferWheels = true;
           python = python;
           overrides = [
-            pkgs.poetry2nix.defaultPoetryOverrides
+            poetry2nix'.defaultPoetryOverrides
             overrides
           ];
         };
