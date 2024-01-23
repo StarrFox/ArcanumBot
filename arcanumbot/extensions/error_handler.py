@@ -18,10 +18,6 @@ async def on_command_error(ctx: commands.Context[ArcanumBot], error):
 
     # Bypass checks for owner
     if isinstance(error, commands.CheckFailure):
-        if await ctx.bot.is_owner(ctx.author):
-            await ctx.reinvoke()
-            return
-
         return await ctx.send("You don't have permission to run that command")
 
     if isinstance(error, commands.CommandOnCooldown):
@@ -29,13 +25,13 @@ async def on_command_error(ctx: commands.Context[ArcanumBot], error):
         natural = naturaldelta(delta)
         # TODO: use pendulum for this so we can drop the humanize dependency
         return await ctx.send(f"Command on cooldown, retry in {natural}.")
-    
+
     # Reset cooldown when command doesn't finish
     else:
         if ctx.command is not None:
             ctx.command.reset_cooldown(ctx)
             cooldown_message = "; cooldown reset"
-        
+
         else:
             cooldown_message = ""
 

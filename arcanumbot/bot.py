@@ -122,6 +122,10 @@ class ArcanumBot(commands.Bot):
         return len(self.extensions.keys()) - before
 
     async def only_one_guild(self, ctx: commands.Context):
+        # allow owner to run debug commands anywhere
+        if self.is_owner(ctx.author):
+            return True
+
         if not ctx.guild:
             raise commands.NoPrivateMessage(f"Please use commands in {self.guild}.")
 
