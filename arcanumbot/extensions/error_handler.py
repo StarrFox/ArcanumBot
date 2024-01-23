@@ -16,9 +16,11 @@ async def on_command_error(ctx: commands.Context[ArcanumBot], error):
     if isinstance(error, commands.CommandNotFound):
         return
 
-    # Bypass checks for owner
     if isinstance(error, commands.CheckFailure):
         return await ctx.send("You don't have permission to run that command")
+
+    if isinstance(error, commands.MaxConcurrencyReached):
+        return await ctx.send(str(error))
 
     if isinstance(error, commands.CommandOnCooldown):
         delta = timedelta(seconds=error.retry_after)
