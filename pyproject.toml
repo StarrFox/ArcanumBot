@@ -15,7 +15,7 @@ humanize = "^4.9.0"
 "discord.py" = "^2.3.2"
 psutil = "^6.0.0"
 click = "^8.1.7"
-uvloop = {version = "^0.20.0", markers = "platform_system == 'Linux'"}
+uvloop = {version = "^0.21.0", markers = "platform_system == 'Linux'"}
 asyncpg = "^0.29.0"
 
 [tool.poetry.scripts]
